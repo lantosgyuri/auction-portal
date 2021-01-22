@@ -49,7 +49,7 @@ func publish() {
 		if err != nil {
 			fmt.Print(err)
 		}
-		redisConn.Publish(ctx, "Test", toSend)
+		redisConn.Publish(ctx, "bid", toSend)
 		i++
 	}
 
@@ -65,7 +65,7 @@ func publish() {
 		if err != nil {
 			fmt.Print(err)
 		}
-		redisConn.Publish(ctx, "Test2", toSend)
+		redisConn.Publish(ctx, "user", toSend)
 		i++
 	}
 }

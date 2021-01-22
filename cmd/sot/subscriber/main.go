@@ -4,7 +4,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/go-redis/redis/v8"
+	"github.com/lantosgyuri/auction-portal/internal/shared"
+	"gopkg.in/yaml.v3"
+	"log"
 )
 
 var ctx = context.Background()
@@ -20,26 +22,41 @@ type User struct {
 	Auctions []int `json:"Auctions"`
 }
 
+type Config struct {
+	RedisConf redisConf `yaml:"redis"`
+}
+
+type redisConf struct {
+	Url  string   `yaml:"url"`
+	Subs []string `yaml:"subscriptions"`
+}
+
 func main() {
 	done := make(chan bool)
-	go subscribeToChan()
-	go subscribeToChan2()
+	var conf Config
+
+	confBytes, err := shared.ReadFile("config.yaml")
+
+	if err != nil {
+		log.Fatal("Can not read config file")
+	}
+
+	err = yaml.Unmarshal(confBytes, &conf)
+
+	if err != nil {
+		log.Fatal("Can not read config file")
+	}
+
+	fmt.Print(conf.RedisConf)
+	go subscribeToChan(conf.RedisConf.Url, conf.RedisConf.Subs[0])
+	go subscribeToChan2(conf.RedisConf.Url, conf.RedisConf.Subs[1])
 	<-done
 }
 
-func CreateRedisClient() *redis.Client {
-	opt, err := redis.ParseURL("redis://localhost:6364")
-	if err != nil {
-		panic(err)
-	}
-
-	return redis.NewClient(opt)
-}
-
-func subscribeToChan() chan bool {
+func subscribeToChan(url string, channel string) chan bool {
 	done := make(chan bool)
-	redisConn := CreateRedisClient()
-	pubs := redisConn.Subscribe(ctx, "Test")
+	redisConn := shared.SetUpRedis(url)
+	pubs := redisConn.Subscribe(ctx, channel)
 	ch := pubs.Channel()
 
 	for msg := range ch {
@@ -54,10 +71,10 @@ func subscribeToChan() chan bool {
 	return done
 }
 
-func subscribeToChan2() chan bool {
+func subscribeToChan2(url string, channel string) chan bool {
 	done := make(chan bool)
-	redisConn := CreateRedisClient()
-	pubs := redisConn.Subscribe(ctx, "Test2")
+	redisConn := shared.SetUpRedis(url)
+	pubs := redisConn.Subscribe(ctx, channel)
 	ch := pubs.Channel()
 
 	for msg := range ch {
