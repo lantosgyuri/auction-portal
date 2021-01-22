@@ -1,0 +1,8 @@
+version: '3.5'
+
+services:
+  crudQ:
+    image: "redis:alpine"
+    ports:
+      - "6364:6379"
+    container_name: 'crudQ'
