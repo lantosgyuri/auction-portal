@@ -5,4 +5,20 @@ services:
     image: "redis:alpine"
     ports:
       - "6364:6379"
+    restart: always
     container_name: 'crudQ'
+  sotDb:
+      image: mariadb
+      restart: always
+      container_name: 'sotDb'
+      ports:
+        - 3306:3306
+      environment:
+        MYSQL_ROOT_PASSWORD: pwd
+      volumes:
+        - ../../dockerData/sot:/var/lib/mysql
+  dbAdmin:
+        image: adminer
+        restart: always
+        ports:
+          - 8080:8080

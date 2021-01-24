@@ -12,9 +12,10 @@ import (
 var ctx = context.Background()
 
 type Bid struct {
-	AuctionId int `json:"AuctionBid"`
-	UserId    int `json:"UserId"`
-	Value     int `json:"Value"`
+	AuctionId int    `json:"AuctionBid"`
+	UserId    int    `json:"UserId"`
+	Value     int    `json:"Value"`
+	Action    string `json:"Action"`
 }
 
 type User struct {
