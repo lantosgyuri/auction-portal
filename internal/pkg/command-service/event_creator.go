@@ -1,7 +1,22 @@
 package command_service
 
-type AggregateValidator interface {
-	Validate() error
+type Publisher interface {
+	Publish() error
 }
 
-type EventCreator struct{}
+type EventDBRepository interface {
+	SaveEvent() error
+	SaveSnapshot() error
+}
+
+type EventCreator struct {
+	publisher Publisher
+}
+
+func SaveToStore(event interface{}) {}
+
+func SaveSnapshot(snapshot interface{}) {}
+
+func Publish(event interface{}) {
+	// Create new event
+}
