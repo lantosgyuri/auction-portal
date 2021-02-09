@@ -4,7 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/lantosgyuri/auction-portal/internal/shared"
+	"github.com/lantosgyuri/auction-portal/internal/pkg/connection"
+	"github.com/lantosgyuri/auction-portal/internal/pkg/input"
 	"gopkg.in/yaml.v3"
 	"log"
 )
@@ -36,7 +37,7 @@ func main() {
 	done := make(chan bool)
 	var conf Config
 
-	confBytes, err := shared.ReadFile("config.yaml")
+	confBytes, err := input.ReadFile("config.yaml")
 
 	if err != nil {
 		log.Fatal("Can not read config file")
@@ -56,7 +57,7 @@ func main() {
 
 func subscribeToChan(url string, channel string) chan bool {
 	done := make(chan bool)
-	redisConn := shared.SetUpRedis(url)
+	redisConn := connection.SetUpRedis(url)
 	pubs := redisConn.Subscribe(ctx, channel)
 	ch := pubs.Channel()
 
@@ -74,7 +75,7 @@ func subscribeToChan(url string, channel string) chan bool {
 
 func subscribeToChan2(url string, channel string) chan bool {
 	done := make(chan bool)
-	redisConn := shared.SetUpRedis(url)
+	redisConn := connection.SetUpRedis(url)
 	pubs := redisConn.Subscribe(ctx, channel)
 	ch := pubs.Channel()
 

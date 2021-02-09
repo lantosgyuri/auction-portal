@@ -2,7 +2,7 @@ package main
 
 import (
 	command_service "github.com/lantosgyuri/auction-portal/internal/pkg/command-service"
-	"github.com/lantosgyuri/auction-portal/internal/shared"
+	"github.com/lantosgyuri/auction-portal/internal/pkg/input"
 	"gopkg.in/yaml.v3"
 	"log"
 )
@@ -19,7 +19,7 @@ func main() {
 	quit := make(chan bool)
 	var conf Config
 
-	confBytes, err := shared.ReadFile("config.yaml")
+	confBytes, err := input.ReadFile("config.yaml")
 
 	if err != nil {
 		log.Fatal("Can not read config file")
@@ -28,7 +28,7 @@ func main() {
 	err = yaml.Unmarshal(confBytes, &conf)
 
 	if err != nil {
-		log.Fatal("Can not read config file")
+		log.Fatal("Can not unmarshal config file")
 	}
 
 	command_service.StartSubscriber(conf.RedisConf.Url)

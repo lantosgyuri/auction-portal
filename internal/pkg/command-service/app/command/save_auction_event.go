@@ -1,12 +1,11 @@
-package comand
+package command
 
 import (
-	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/app"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/domain"
 )
 
 type SaveAuctionEventHandler struct {
-	repo app.Repository
+	Repo Repository
 }
 
 func (s SaveAuctionEventHandler) Handle(event domain.Event) error {
@@ -14,5 +13,5 @@ func (s SaveAuctionEventHandler) Handle(event domain.Event) error {
 		Event: event.Event,
 		Data:  string(event.Payload),
 	}
-	return s.repo.SaveAuctionEvent(nEvent)
+	return s.Repo.SaveAuctionEvent(nEvent)
 }
