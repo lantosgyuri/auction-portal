@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"github.com/go-redis/redis/v8"
 )
 
@@ -16,9 +15,16 @@ type Bid struct {
 	Action    string `json:"Action"`
 }
 
-type User struct {
-	Id       int   `json:"Id"`
-	Auctions []int `json:"Auctions"`
+type CreateAuction struct {
+	Name      string
+	DueDate   int
+	StartDate int
+	Timestamp int
+}
+
+type Event struct {
+	Event   string
+	Payload []byte
 }
 
 func main() {
@@ -35,38 +41,23 @@ func CreateRedisClient() *redis.Client {
 }
 
 func publish() {
-	var i int
-
 	redisConn := CreateRedisClient()
 
-	for i < 10 {
-		newBid := Bid{
-			AuctionId: i,
-			UserId:    i + 10,
-			Value:     i + 20,
-		}
-		fmt.Println(newBid)
-		toSend, err := json.Marshal(newBid)
-		if err != nil {
-			fmt.Print(err)
-		}
-		redisConn.Publish(ctx, "bid", toSend)
-		i++
+	user := CreateAuction{
+		DueDate:   6,
+		StartDate: 3,
+		Timestamp: 1,
+		Name:      "JOZSIKA",
 	}
 
-	for i < 20 {
-		user := User{
-			Id: i,
-			Auctions: []int{
-				i + 10,
-			},
-		}
-		fmt.Println(user)
-		toSend, err := json.Marshal(user)
-		if err != nil {
-			fmt.Print(err)
-		}
-		redisConn.Publish(ctx, "user", toSend)
-		i++
+	userBytes, _ := json.Marshal(user)
+
+	event := Event{
+		Event:   "AUCTION_CREATED",
+		Payload: userBytes,
 	}
+
+	messageBytes, _ := json.Marshal(event)
+
+	redisConn.Publish(ctx, "Auction", messageBytes)
 }
