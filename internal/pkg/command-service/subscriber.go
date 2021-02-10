@@ -7,16 +7,18 @@ import (
 	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/app"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/app/command"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/domain"
+	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/event-reaction"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/connection"
 	"sync"
 )
 
-// Events can happen:
+//  Events can happen:
 // 	User add bid to auction
 // 	User delete bid from auction
 //	Auction created
 //	User created
 //	User deleted
+// 	Bid doubled
 
 // Channels:
 //	Auction: Auction created, bid placed, bid deleted
@@ -35,11 +37,13 @@ func (i InMemoryDb) CreateNewAuction(auction domain.CreateAuction) error {
 	return nil
 }
 
-func StartSubscriber(url string) {
+func StartSubscriber(url string, parentWg *sync.WaitGroup) {
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 
-	eventChan := make(chan domain.Event)
+	auctionEventChan := make(chan domain.Event)
+	bidEventChan := make(chan domain.Event)
+	userEventChan := make(chan domain.Event)
 
 	application := app.Application{
 		Commands: app.Commands{
@@ -49,9 +53,17 @@ func StartSubscriber(url string) {
 		Queries: app.Queries{},
 	}
 
-	go subscribeToChan(url, "Auction", &wg, eventChan)
-	go consumeMessages(application, eventChan)
+	go handleChannel(url, "Auction", &wg, application, auctionEventChan)
+	go handleChannel(url, "Bid", &wg, application, bidEventChan)
+	go handleChannel(url, "User", &wg, application, userEventChan)
+
 	wg.Wait()
+	parentWg.Done()
+}
+
+func handleChannel(url string, channelName string, wg *sync.WaitGroup, application app.Application, eventChan chan domain.Event) {
+	go subscribeToChan(url, channelName, wg, eventChan)
+	go consumeMessages(application, eventChan)
 }
 
 func subscribeToChan(url string, channelName string, wg *sync.WaitGroup, eventChan chan domain.Event) {
@@ -75,21 +87,15 @@ func subscribeToChan(url string, channelName string, wg *sync.WaitGroup, eventCh
 
 func consumeMessages(application app.Application, eventChan chan domain.Event) {
 	for event := range eventChan {
-		switch event.Event {
-		case "AUCTION_CREATED":
-			var auction domain.CreateAuction
-			if err := json.Unmarshal(event.Payload, &auction); err != nil {
-				fmt.Printf("Error happened with unmarshalling user: %v", err)
+		reaction, found := event_reaction.Commands[event.Event]
+		if found {
+			if err := reaction.Execute(application, event); err != nil {
+				fmt.Printf("error happened during event reaction: %v", err)
 			}
-			err := application.Commands.CreateAuction.Handle(command.CreateAuction{Auction: auction})
-			if err != nil {
-				fmt.Printf("Error happened with creating auction: %v", err)
-			}
-			err = application.Commands.SaveAuctionEvent.Handle(event)
-			fmt.Printf("Event is: %v", auction)
+		}
 
-		default:
-			fmt.Printf("no event like this: %v", event.Event)
+		if !found {
+			fmt.Printf("no event reaction for this event: %v", event.Event)
 		}
 	}
 }

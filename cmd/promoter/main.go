@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/go-redis/redis/v8"
+	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/event-reaction"
 )
 
 var ctx = context.Background()
@@ -53,7 +54,7 @@ func publish() {
 	userBytes, _ := json.Marshal(user)
 
 	event := Event{
-		Event:   "AUCTION_CREATED",
+		Event:   event_reaction.EventMessageNames.AuctionRequested,
 		Payload: userBytes,
 	}
 

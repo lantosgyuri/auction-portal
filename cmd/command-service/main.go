@@ -5,6 +5,7 @@ import (
 	"github.com/lantosgyuri/auction-portal/internal/pkg/input"
 	"gopkg.in/yaml.v3"
 	"log"
+	"sync"
 )
 
 type Config struct {
@@ -16,7 +17,8 @@ type redisConf struct {
 }
 
 func main() {
-	quit := make(chan bool)
+	wg := sync.WaitGroup{}
+	wg.Add(1)
 	var conf Config
 
 	confBytes, err := input.ReadFile("config.yaml")
@@ -31,6 +33,6 @@ func main() {
 		log.Fatal("Can not unmarshal config file")
 	}
 
-	command_service.StartSubscriber(conf.RedisConf.Url)
-	<-quit
+	command_service.StartSubscriber(conf.RedisConf.Url, &wg)
+	wg.Wait()
 }
