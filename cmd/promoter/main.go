@@ -4,7 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/go-redis/redis/v8"
-	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/event-reaction"
+	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/domain"
+	"time"
 )
 
 var ctx = context.Background()
@@ -45,20 +46,37 @@ func publish() {
 	redisConn := CreateRedisClient()
 
 	user := CreateAuction{
-		DueDate:   6,
-		StartDate: 3,
-		Timestamp: 1,
+		DueDate:   int(time.Now().AddDate(0, 0, 7).Unix()),
+		StartDate: int(time.Now().AddDate(0, 0, 2).Unix()),
+		Timestamp: int(time.Now().Unix()),
 		Name:      "JOZSIKA",
 	}
 
 	userBytes, _ := json.Marshal(user)
 
 	event := Event{
-		Event:   event_reaction.EventMessageNames.AuctionRequested,
+		Event:   domain.AuctionRequested,
 		Payload: userBytes,
 	}
 
 	messageBytes, _ := json.Marshal(event)
 
 	redisConn.Publish(ctx, "Auction", messageBytes)
+
+	winner := domain.AuctionWinnerMessage{
+		Timestamp: int(time.Now().Unix()),
+		WinnerId:  1,
+		AuctionId: 1,
+	}
+
+	winnerBytes, _ := json.Marshal(winner)
+
+	eventWinner := Event{
+		Event:   domain.AuctionWinnerAnnounced,
+		Payload: winnerBytes,
+	}
+
+	winnerMessageBytes, _ := json.Marshal(eventWinner)
+
+	redisConn.Publish(ctx, "Auction", winnerMessageBytes)
 }

@@ -12,28 +12,21 @@ import (
 	"sync"
 )
 
-//  Events can happen:
-// 	User add bid to auction
-// 	User delete bid from auction
-//	Auction created
-//	User created
-//	User deleted
-// 	Bid doubled
-
-// Channels:
-//	Auction: Auction created, bid placed, bid deleted
-//	User: User created, user deleted
-
 type InMemoryDb struct {
 }
 
-func (i InMemoryDb) SaveAuctionEvent(event domain.NormalizedAuctionEvent) error {
+func (i InMemoryDb) SaveAuctionEvent(event domain.AuctionEvent) error {
 	fmt.Printf("saving auction event %v \n", event)
 	return nil
 }
 
-func (i InMemoryDb) CreateNewAuction(auction domain.CreateAuction) error {
-	fmt.Printf("saving auction event %v \n", auction)
+func (i InMemoryDb) CreateNewAuction(auction domain.CreateAuctionMessage) error {
+	fmt.Printf("saving auction %v \n", auction)
+	return nil
+}
+
+func (i InMemoryDb) SaveWinner(message domain.AuctionWinnerMessage) error {
+	fmt.Printf("saving winner %v \n", message)
 	return nil
 }
 
@@ -49,6 +42,7 @@ func StartSubscriber(url string, parentWg *sync.WaitGroup) {
 		Commands: app.Commands{
 			CreateAuction:    command.CreateAuctionHandler{Repo: InMemoryDb{}},
 			SaveAuctionEvent: command.SaveAuctionEventHandler{Repo: InMemoryDb{}},
+			SaveWinner:       command.SaveWinner{Repo: InMemoryDb{}},
 		},
 		Queries: app.Queries{},
 	}
@@ -88,14 +82,12 @@ func subscribeToChan(url string, channelName string, wg *sync.WaitGroup, eventCh
 func consumeMessages(application app.Application, eventChan chan domain.Event) {
 	for event := range eventChan {
 		reaction, found := event_reaction.Commands[event.Event]
-		if found {
-			if err := reaction.Execute(application, event); err != nil {
-				fmt.Printf("error happened during event reaction: %v", err)
-			}
-		}
-
 		if !found {
 			fmt.Printf("no event reaction for this event: %v", event.Event)
+			continue
+		}
+		if err := reaction.Execute(application, event); err != nil {
+			fmt.Printf("error happened during event reaction: %v", err)
 		}
 	}
 }

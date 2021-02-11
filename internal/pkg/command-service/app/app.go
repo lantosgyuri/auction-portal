@@ -10,6 +10,7 @@ type Application struct {
 type Commands struct {
 	CreateAuction    command.CreateAuctionHandler
 	SaveAuctionEvent command.SaveAuctionEventHandler
+	SaveWinner       command.SaveWinner
 }
 
 type Queries struct{}

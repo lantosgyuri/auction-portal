@@ -7,35 +7,28 @@ import (
 	"time"
 )
 
-/* It is currently the same as Auction. I created this abstraction because
-if there is a business logic change, than I only should change this struct.
-*/
-type CreateAuction struct {
-	Auction domain.CreateAuction
-}
-
 type CreateAuctionHandler struct {
-	Repo Repository
+	Repo AuctionRepository
 }
 
-func (c CreateAuctionHandler) Handle(cmd CreateAuction) error {
+func (c CreateAuctionHandler) Handle(auction domain.CreateAuctionMessage) error {
 	now := int(time.Now().Unix())
 
-	if cmd.Auction.Name == "" {
+	if auction.Name == "" {
 		return errors.New("no name provided for auction")
 	}
 
-	if cmd.Auction.DueDate < now {
-		return errors.New(fmt.Sprintf("not valid DueDate. CurrentTime: %v, DueDate: %v", now, cmd.Auction.DueDate))
+	if auction.DueDate < now {
+		return errors.New(fmt.Sprintf("not valid DueDate. CurrentTime: %v, DueDate: %v", now, auction.DueDate))
 	}
 
-	if cmd.Auction.StartDate < now {
-		return errors.New(fmt.Sprintf("not valid StartDate. CurrentTime: %v, StartDate: %v", now, cmd.Auction.StartDate))
+	if auction.StartDate < now {
+		return errors.New(fmt.Sprintf("not valid StartDate. CurrentTime: %v, StartDate: %v", now, auction.StartDate))
 	}
 
-	if cmd.Auction.StartDate > cmd.Auction.DueDate {
-		return errors.New(fmt.Sprintf("invalid dates. StartDate: %v, DueDate: %v", cmd.Auction.StartDate, cmd.Auction.DueDate))
+	if auction.StartDate > auction.DueDate {
+		return errors.New(fmt.Sprintf("invalid dates. StartDate: %v, DueDate: %v", auction.StartDate, auction.DueDate))
 	}
 
-	return c.Repo.CreateNewAuction(cmd.Auction)
+	return c.Repo.CreateNewAuction(auction)
 }

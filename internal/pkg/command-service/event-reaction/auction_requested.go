@@ -5,22 +5,21 @@ import (
 	"errors"
 	"fmt"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/app"
-	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/app/command"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/domain"
 )
 
 func init() {
-	Commands[EventMessageNames.AuctionRequested] = AuctionRequested{}
+	Commands[domain.AuctionRequested] = AuctionRequestedCommand{}
 }
 
-type AuctionRequested struct{}
+type AuctionRequestedCommand struct{}
 
-func (a AuctionRequested) Execute(application app.Application, event domain.Event) error {
-	var auction domain.CreateAuction
+func (a AuctionRequestedCommand) Execute(application app.Application, event domain.Event) error {
+	var auction domain.CreateAuctionMessage
 	if err := json.Unmarshal(event.Payload, &auction); err != nil {
-		return errors.New(fmt.Sprintf("Error happened with unmarshalling user: %v", err))
+		return errors.New(fmt.Sprintf("Error happened with unmarshalling auction create: %v", err))
 	}
-	err := application.Commands.CreateAuction.Handle(command.CreateAuction{Auction: auction})
+	err := application.Commands.CreateAuction.Handle(auction)
 	if err != nil {
 		return errors.New(fmt.Sprintf("Error happened with creating auction: %v", err))
 	}
@@ -28,7 +27,6 @@ func (a AuctionRequested) Execute(application app.Application, event domain.Even
 	if err != nil {
 		return errors.New(fmt.Sprintf("Error happened during saving the auction event: %v", err))
 	}
-	fmt.Printf("Event is: %v", auction)
 
 	return nil
 }

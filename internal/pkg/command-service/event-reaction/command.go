@@ -7,14 +7,6 @@ import (
 
 var Commands = make(map[string]Command)
 
-var EventMessageNames = EventMessageNamesConst{
-	AuctionRequested: "Auction_Creation_Requested",
-}
-
 type Command interface {
 	Execute(application app.Application, event domain.Event) error
-}
-
-type EventMessageNamesConst struct {
-	AuctionRequested string
 }
