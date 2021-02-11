@@ -14,31 +14,20 @@ type SaveAuctionEventHandler struct {
 func (s SaveAuctionEventHandler) Handle(event domain.Event) error {
 	eventType := event.Event
 
-	auctionEvent := domain.AuctionEvent{}
-
 	switch eventType {
 	case domain.AuctionRequested:
-		var auctionCreate domain.CreateAuctionMessage
+		var auctionCreate domain.CreateAuctionRequested
 		if err := json.Unmarshal(event.Payload, &auctionCreate); err != nil {
 			return errors.New("can not marshal event payload")
 		}
-		auctionEvent.Name = auctionCreate.Name
-		auctionEvent.DueDate = auctionCreate.DueDate
-		auctionEvent.StartDate = auctionCreate.StartDate
-		auctionEvent.Timestamp = auctionCreate.Timestamp
-
+		return s.Repo.SaveAuctionEvent(auctionCreate)
 	case domain.AuctionWinnerAnnounced:
-		var winner domain.AuctionWinnerMessage
+		var winner domain.WinnerAnnounced
 		if err := json.Unmarshal(event.Payload, &winner); err != nil {
 			return errors.New("can not marshal event payload")
 		}
-		auctionEvent.AuctionId = winner.AuctionId
-		auctionEvent.Winner = winner.WinnerId
-		auctionEvent.Timestamp = winner.Timestamp
-
+		return s.Repo.SaveAuctionEvent(winner)
 	default:
 		return errors.New(fmt.Sprintf("no event found for: %v", eventType))
 	}
-
-	return s.Repo.SaveAuctionEvent(auctionEvent)
 }

@@ -4,6 +4,6 @@ import "github.com/lantosgyuri/auction-portal/internal/pkg/command-service/domai
 
 type AuctionRepository interface {
 	SaveAuctionEvent(event domain.AuctionEvent) error
-	CreateNewAuction(auction domain.CreateAuctionMessage) error
-	SaveWinner(auctionWinnerMessage domain.AuctionWinnerMessage) error
+	CreateNewAuction(auction domain.Auction) error
+	SaveWinner(auctionWinnerMessage domain.WinnerAnnounced) error
 }

@@ -6,6 +6,6 @@ type SaveWinner struct {
 	Repo AuctionRepository
 }
 
-func (s SaveWinner) Handle(winner domain.AuctionWinnerMessage) error {
+func (s SaveWinner) Handle(winner domain.WinnerAnnounced) error {
 	return s.Repo.SaveWinner(winner)
 }

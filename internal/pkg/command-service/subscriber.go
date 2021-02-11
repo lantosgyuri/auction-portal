@@ -20,12 +20,12 @@ func (i InMemoryDb) SaveAuctionEvent(event domain.AuctionEvent) error {
 	return nil
 }
 
-func (i InMemoryDb) CreateNewAuction(auction domain.CreateAuctionMessage) error {
+func (i InMemoryDb) CreateNewAuction(auction domain.Auction) error {
 	fmt.Printf("saving auction %v \n", auction)
 	return nil
 }
 
-func (i InMemoryDb) SaveWinner(message domain.AuctionWinnerMessage) error {
+func (i InMemoryDb) SaveWinner(message domain.WinnerAnnounced) error {
 	fmt.Printf("saving winner %v \n", message)
 	return nil
 }

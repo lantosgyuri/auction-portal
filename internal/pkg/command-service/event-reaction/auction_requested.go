@@ -15,7 +15,7 @@ func init() {
 type AuctionRequestedCommand struct{}
 
 func (a AuctionRequestedCommand) Execute(application app.Application, event domain.Event) error {
-	var auction domain.CreateAuctionMessage
+	var auction domain.CreateAuctionRequested
 	if err := json.Unmarshal(event.Payload, &auction); err != nil {
 		return errors.New(fmt.Sprintf("Error happened with unmarshalling auction create: %v", err))
 	}

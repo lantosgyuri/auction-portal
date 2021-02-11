@@ -11,7 +11,7 @@ type CreateAuctionHandler struct {
 	Repo AuctionRepository
 }
 
-func (c CreateAuctionHandler) Handle(auction domain.CreateAuctionMessage) error {
+func (c CreateAuctionHandler) Handle(auction domain.CreateAuctionRequested) error {
 	now := int(time.Now().Unix())
 
 	if auction.Name == "" {
@@ -30,5 +30,7 @@ func (c CreateAuctionHandler) Handle(auction domain.CreateAuctionMessage) error 
 		return errors.New(fmt.Sprintf("invalid dates. StartDate: %v, DueDate: %v", auction.StartDate, auction.DueDate))
 	}
 
-	return c.Repo.CreateNewAuction(auction)
+	// build the AuctionFromMessage
+
+	return c.Repo.CreateNewAuction(domain.Auction{})
 }

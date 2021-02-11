@@ -1,6 +1,9 @@
 package app
 
-import "github.com/lantosgyuri/auction-portal/internal/pkg/command-service/app/command"
+import (
+	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/app/command"
+	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/app/query"
+)
 
 type Application struct {
 	Commands Commands
@@ -13,4 +16,6 @@ type Commands struct {
 	SaveWinner       command.SaveWinner
 }
 
-type Queries struct{}
+type Queries struct {
+	GetBidsForAuction query.BidsForAuctionHandler
+}

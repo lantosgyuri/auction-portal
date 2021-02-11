@@ -63,7 +63,7 @@ func publish() {
 
 	redisConn.Publish(ctx, "Auction", messageBytes)
 
-	winner := domain.AuctionWinnerMessage{
+	winner := domain.WinnerAnnounced{
 		Timestamp: int(time.Now().Unix()),
 		WinnerId:  1,
 		AuctionId: 1,

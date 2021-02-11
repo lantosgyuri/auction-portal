@@ -4,11 +4,11 @@ create table auction
     name varchar(255) not null
 );
 
-create table auction_events
+create table auction_event
 (
     id int unsigned auto_increment
         primary key,
-    auction_id int not null,
+    auction_id int,
     version int not null,
     type varchar(255) not null,
     data longtext,
