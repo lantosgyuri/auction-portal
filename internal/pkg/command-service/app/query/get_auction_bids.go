@@ -10,9 +10,9 @@ type BidsForAuctionHandler struct {
 }
 
 type BidsForAuctionReader interface {
-	FindBidsForAuction(ctx context.Context, auctionId int) ([]domain.AuctionEvent, error)
+	FindBidsForAuction(ctx context.Context, auctionId string) ([]domain.AuctionEvent, error)
 }
 
-func (b BidsForAuctionHandler) Handle(ctx context.Context, auctionId int) ([]domain.AuctionEvent, error) {
+func (b BidsForAuctionHandler) Handle(ctx context.Context, auctionId string) ([]domain.AuctionEvent, error) {
 	return b.reader.FindBidsForAuction(ctx, auctionId)
 }

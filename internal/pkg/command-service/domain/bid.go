@@ -1,25 +1,35 @@
 package domain
 
+type BidEvent interface {
+	GetUserId() int
+}
+
 type BidPlaced struct {
-	AuctionId int
+	AuctionId string
+	Promoted  bool
 	UserId    int
 	Amount    int
 	TimeStamp int
 }
 
 type BidDeleted struct {
-	AuctionId int
-	UserId    int
-	TimeStamp int
+	AuctionId  string
+	ShouldSwap bool
+	UserId     int
+	Amount     int
+	TimeStamp  int
 }
 
-type BidDoubled struct {
-	AuctionId int
-	UserId    int
-	Amount    int
-	TimeStamp int
+func (b BidPlaced) GetAuctionId() string {
+	return b.AuctionId
+}
+func (b BidPlaced) GetUserId() int {
+	return b.UserId
 }
 
-func (b BidPlaced) isAuctionEvent()  {}
-func (b BidDeleted) isAuctionEvent() {}
-func (b BidDoubled) isAuctionEvent() {}
+func (b BidDeleted) GetAuctionId() string {
+	return b.AuctionId
+}
+func (b BidDeleted) GetUserId() int {
+	return b.UserId
+}

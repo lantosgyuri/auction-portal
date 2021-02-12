@@ -30,7 +30,7 @@ func (c CreateAuctionHandler) Handle(auction domain.CreateAuctionRequested) erro
 		return errors.New(fmt.Sprintf("invalid dates. StartDate: %v, DueDate: %v", auction.StartDate, auction.DueDate))
 	}
 
-	// build the AuctionFromMessage
+	newAuction := domain.NewAuction(auction)
 
-	return c.Repo.CreateNewAuction(domain.Auction{})
+	return c.Repo.CreateNewAuction(newAuction)
 }
