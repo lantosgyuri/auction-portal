@@ -20,6 +20,7 @@ type Commands struct {
 }
 
 type Queries struct {
-	GetAuctionState   query.AuctionStateHandler
-	GetBidsForAuction query.BidForAuctionHandler
+	GetAuctionState         query.AuctionStateHandler
+	GetBidsForAuction       query.BidForAuctionHandler
+	GetHighestBidForAuction query.UserHighestBidHandler
 }

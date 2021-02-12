@@ -11,4 +11,5 @@ type AuctionStateReader interface {
 
 type BidReader interface {
 	FindBidsForAuctionDescending(ctx context.Context, auctionId string) ([]domain.Bid, error)
+	FindUserHighestBidForAuction(ctx context.Context, auctionID string, userId int) (domain.Bid, error)
 }
