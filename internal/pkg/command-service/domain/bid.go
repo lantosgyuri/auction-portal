@@ -4,6 +4,15 @@ type BidEvent interface {
 	GetUserId() int
 }
 
+type BidEventRaw struct {
+	AuctionId string
+	UserId    int
+	EventType string
+	BidId     int
+	Amount    int
+	TimeStamp int
+}
+
 type BidPlaced struct {
 	AuctionId string
 	Promoted  bool
@@ -15,6 +24,7 @@ type BidPlaced struct {
 type BidDeleted struct {
 	AuctionId  string
 	ShouldSwap bool
+	BidId      int
 	UserId     int
 	Amount     int
 	TimeStamp  int

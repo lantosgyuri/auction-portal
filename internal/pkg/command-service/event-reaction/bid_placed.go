@@ -25,5 +25,9 @@ func (b BidPlaceRequestedCommand) Execute(application app.Application, event dom
 		return err
 	}
 
+	if err := application.Commands.SaveBidEvent.Handle(event.Event, bidPlacedMessage); err != nil {
+		return err
+	}
+
 	return nil
 }

@@ -9,7 +9,7 @@ type AuctionRepository interface {
 }
 
 type BidRepository interface {
-	SaveBidEvent(event domain.BidEvent) error
+	SaveBidEvent(event domain.BidEventRaw) error
 }
 
 type UserRepository interface {

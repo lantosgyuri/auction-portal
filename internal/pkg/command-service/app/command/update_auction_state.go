@@ -7,11 +7,11 @@ type UpdateStateCommand struct {
 	Event        domain.AuctionEvent
 }
 
-type UpdateState struct {
+type UpdateStateHandler struct {
 	Repo AuctionRepository
 }
 
-func (u UpdateState) Handle(cmd UpdateStateCommand) error {
+func (u UpdateStateHandler) Handle(cmd UpdateStateCommand) error {
 	newState := domain.ApplyOnSnapshot(cmd.CurrentState, cmd.Event)
 	return u.Repo.UpdateAuctionState(newState)
 }

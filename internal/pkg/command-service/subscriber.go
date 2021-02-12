@@ -31,6 +31,11 @@ func (i InMemoryDb) UpdateAuctionState(auction domain.Auction) error {
 	return nil
 }
 
+func (i InMemoryDb) SaveBidEvent(event domain.BidEventRaw) error {
+	fmt.Printf("saving bid event %v \n", event)
+	return nil
+}
+
 func (I InMemoryDb) FindAuction(ctx context.Context, auctionID string) (domain.Auction, error) {
 	return domain.Auction{
 		UUID:        "t",
@@ -54,7 +59,8 @@ func StartSubscriber(url string, parentWg *sync.WaitGroup) {
 		Commands: app.Commands{
 			CreateAuction:    command.CreateAuctionHandler{Repo: InMemoryDb{}},
 			SaveAuctionEvent: command.SaveAuctionEventHandler{Repo: InMemoryDb{}},
-			UpdateState:      command.UpdateState{Repo: InMemoryDb{}},
+			UpdateState:      command.UpdateStateHandler{Repo: InMemoryDb{}},
+			SaveBidEvent:     command.SaveBidEventHandler{Repo: InMemoryDb{}},
 		},
 		Queries: app.Queries{
 			GetAuctionState: query.AuctionStateHandler{

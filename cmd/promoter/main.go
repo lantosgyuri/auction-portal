@@ -79,4 +79,40 @@ func publish() {
 	winnerMessageBytes, _ := json.Marshal(eventWinner)
 
 	redisConn.Publish(ctx, "Auction", winnerMessageBytes)
+
+	bidPLaced := domain.BidPlaced{
+		Promoted:  false,
+		Amount:    20,
+		UserId:    41,
+		AuctionId: "test",
+	}
+
+	bidPLacedbytes, _ := json.Marshal(bidPLaced)
+
+	bidPlacedEvent := Event{
+		Event:   domain.BidPlaceRequested,
+		Payload: bidPLacedbytes,
+	}
+
+	bidPLacedEvetnBytes, _ := json.Marshal(bidPlacedEvent)
+
+	redisConn.Publish(ctx, "Bid", bidPLacedEvetnBytes)
+
+	bidDeleted := domain.BidDeleted{
+		BidId:     40,
+		Amount:    20,
+		UserId:    41,
+		AuctionId: "test",
+	}
+
+	bidDeletedbytes, _ := json.Marshal(bidDeleted)
+
+	bidDeletedEcent := Event{
+		Event:   domain.BidDeleteRequested,
+		Payload: bidDeletedbytes,
+	}
+
+	bidDeletedEvetnBytes, _ := json.Marshal(bidDeletedEcent)
+
+	redisConn.Publish(ctx, "Bid", bidDeletedEvetnBytes)
 }

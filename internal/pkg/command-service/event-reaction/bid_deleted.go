@@ -1,6 +1,7 @@
 package event_reaction
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -19,6 +20,13 @@ func (b BidDeleteRequestedCommand) Execute(application app.Application, event do
 
 	if err := json.Unmarshal(event.Payload, &bidDeleteMessage); err != nil {
 		return errors.New(fmt.Sprintf("Error happened with unmarshalling winner message: %v", err))
+	}
+
+	if err := UpdateState(context.Background(), bidDeleteMessage, application); err != nil {
+		return err
+	}
+	if err := application.Commands.SaveBidEvent.Handle(event.Event, bidDeleteMessage); err != nil {
+		return err
 	}
 
 	return nil
