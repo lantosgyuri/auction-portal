@@ -15,8 +15,11 @@ type Commands struct {
 	SaveAuctionEvent command.SaveAuctionEventHandler
 	UpdateState      command.UpdateStateHandler
 	SaveBidEvent     command.SaveBidEventHandler
+	CreateBid        command.CreateBidHandler
+	DeleteBid        command.DeleteBidHandler
 }
 
 type Queries struct {
-	GetAuctionState query.AuctionStateHandler
+	GetAuctionState   query.AuctionStateHandler
+	GetBidsForAuction query.BidForAuctionHandler
 }

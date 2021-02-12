@@ -8,3 +8,7 @@ import (
 type AuctionStateReader interface {
 	FindAuction(ctx context.Context, auctionId string) (domain.Auction, error)
 }
+
+type BidReader interface {
+	FindBidsForAuctionDescending(ctx context.Context, auctionId string) ([]domain.Bid, error)
+}

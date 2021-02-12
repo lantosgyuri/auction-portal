@@ -10,8 +10,10 @@ type AuctionRepository interface {
 
 type BidRepository interface {
 	SaveBidEvent(event domain.BidEventRaw) error
+	CreateBid(bid domain.BidPlaced) error
+	DeleteBid(bid domain.BidDeleted) error
 }
 
 type UserRepository interface {
-	SaveUSerEvent() error
+	SaveUserEvent() error
 }

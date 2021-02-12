@@ -4,6 +4,14 @@ type BidEvent interface {
 	GetUserId() int
 }
 
+type Bid struct {
+	Id        int
+	UserId    int
+	AuctionId string
+	Promoted  bool
+	Amount    int
+}
+
 type BidEventRaw struct {
 	AuctionId string
 	UserId    int
