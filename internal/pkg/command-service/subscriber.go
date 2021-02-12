@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/app"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/app/command"
+	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/app/query"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/domain"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/event-reaction"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/connection"
@@ -15,7 +16,7 @@ import (
 type InMemoryDb struct {
 }
 
-func (i InMemoryDb) SaveAuctionEvent(event domain.AuctionEvent) error {
+func (i InMemoryDb) SaveAuctionEvent(event domain.AuctionEventRaw) error {
 	fmt.Printf("saving auction event %v \n", event)
 	return nil
 }
@@ -25,9 +26,20 @@ func (i InMemoryDb) CreateNewAuction(auction domain.Auction) error {
 	return nil
 }
 
-func (i InMemoryDb) SaveWinner(message domain.WinnerAnnounced) error {
-	fmt.Printf("saving winner %v \n", message)
+func (i InMemoryDb) UpdateAuctionState(auction domain.Auction) error {
+	fmt.Printf("updating auction %v \n", auction)
 	return nil
+}
+
+func (I InMemoryDb) FindAuction(ctx context.Context, auctionID string) (domain.Auction, error) {
+	return domain.Auction{
+		UUID:        "t",
+		Name:        "Test",
+		StartDate:   1,
+		DueDate:     2,
+		CurrentBid:  0,
+		CurrentUser: 0,
+	}, nil
 }
 
 func StartSubscriber(url string, parentWg *sync.WaitGroup) {
@@ -42,9 +54,13 @@ func StartSubscriber(url string, parentWg *sync.WaitGroup) {
 		Commands: app.Commands{
 			CreateAuction:    command.CreateAuctionHandler{Repo: InMemoryDb{}},
 			SaveAuctionEvent: command.SaveAuctionEventHandler{Repo: InMemoryDb{}},
-			SaveWinner:       command.SaveWinner{Repo: InMemoryDb{}},
+			UpdateState:      command.UpdateState{Repo: InMemoryDb{}},
 		},
-		Queries: app.Queries{},
+		Queries: app.Queries{
+			GetAuctionState: query.AuctionStateHandler{
+				Reader: InMemoryDb{},
+			},
+		},
 	}
 
 	go handleChannel(url, "Auction", &wg, application, auctionEventChan)

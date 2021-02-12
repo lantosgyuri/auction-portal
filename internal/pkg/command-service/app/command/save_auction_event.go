@@ -1,7 +1,6 @@
 package command
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/domain"
@@ -11,23 +10,22 @@ type SaveAuctionEventHandler struct {
 	Repo AuctionRepository
 }
 
-func (s SaveAuctionEventHandler) Handle(event domain.Event) error {
-	eventType := event.Event
-
-	switch eventType {
-	case domain.AuctionRequested:
-		var auctionCreate domain.CreateAuctionRequested
-		if err := json.Unmarshal(event.Payload, &auctionCreate); err != nil {
-			return errors.New("can not marshal event payload")
-		}
-		return s.Repo.SaveAuctionEvent(auctionCreate)
-	case domain.AuctionWinnerAnnounced:
-		var winner domain.WinnerAnnounced
-		if err := json.Unmarshal(event.Payload, &winner); err != nil {
-			return errors.New("can not marshal event payload")
-		}
-		return s.Repo.SaveAuctionEvent(winner)
+func (s SaveAuctionEventHandler) Handle(eventName string, event domain.AuctionEvent) error {
+	rawEvent := domain.AuctionEventRaw{
+		EventType: eventName,
+	}
+	switch e := event.(type) {
+	case domain.CreateAuctionRequested:
+		rawEvent.Name = e.Name
+		rawEvent.DueDate = e.DueDate
+		rawEvent.StartDate = e.StartDate
+		rawEvent.Timestamp = e.Timestamp
+		return s.Repo.SaveAuctionEvent(rawEvent)
+	case domain.WinnerAnnounced:
+		rawEvent.Winner = e.WinnerId
+		rawEvent.Timestamp = e.Timestamp
+		return s.Repo.SaveAuctionEvent(rawEvent)
 	default:
-		return errors.New(fmt.Sprintf("no event found for: %v", eventType))
+		return errors.New(fmt.Sprintf("no event found for: %v", e))
 	}
 }

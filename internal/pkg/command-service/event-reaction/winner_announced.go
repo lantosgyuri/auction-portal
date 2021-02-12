@@ -1,6 +1,7 @@
 package event_reaction
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -20,10 +21,11 @@ func (w WinnerAnnouncedCommand) Execute(application app.Application, event domai
 		return errors.New(fmt.Sprintf("Error happened with unmarshalling winner message: %v", err))
 	}
 
-	if err := application.Commands.SaveWinner.Handle(winnerMessage); err != nil {
-		return errors.New(fmt.Sprintf("Error happened with saving winner: %v", err))
+	if err := UpdateState(context.Background(), winnerMessage, application); err != nil {
+		return err
 	}
-	if err := application.Commands.SaveAuctionEvent.Handle(event); err != nil {
+
+	if err := application.Commands.SaveAuctionEvent.Handle(event.Event, winnerMessage); err != nil {
 		return errors.New(fmt.Sprintf("Error happened during saving the auction event: %v", err))
 	}
 	return nil

@@ -65,7 +65,7 @@ func publish() {
 
 	winner := domain.WinnerAnnounced{
 		Timestamp: int(time.Now().Unix()),
-		WinnerId:  1,
+		WinnerId:  19880,
 		AuctionId: "test",
 	}
 

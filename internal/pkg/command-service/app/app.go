@@ -13,9 +13,9 @@ type Application struct {
 type Commands struct {
 	CreateAuction    command.CreateAuctionHandler
 	SaveAuctionEvent command.SaveAuctionEventHandler
-	SaveWinner       command.SaveWinner
+	UpdateState      command.UpdateState
 }
 
 type Queries struct {
-	GetBidsForAuction query.BidsForAuctionHandler
+	GetAuctionState query.AuctionStateHandler
 }

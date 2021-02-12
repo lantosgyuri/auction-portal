@@ -23,7 +23,7 @@ func (a AuctionRequestedCommand) Execute(application app.Application, event doma
 	if err != nil {
 		return errors.New(fmt.Sprintf("Error happened with creating auction: %v", err))
 	}
-	err = application.Commands.SaveAuctionEvent.Handle(event)
+	err = application.Commands.SaveAuctionEvent.Handle(event.Event, auction)
 	if err != nil {
 		return errors.New(fmt.Sprintf("Error happened during saving the auction event: %v", err))
 	}

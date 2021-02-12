@@ -4,6 +4,16 @@ type AuctionEvent interface {
 	GetAuctionId() string
 }
 
+type AuctionEventRaw struct {
+	EventType string
+	Name      string
+	AuctionId string
+	DueDate   int
+	StartDate int
+	Winner    int
+	Timestamp int
+}
+
 type CreateAuctionRequested struct {
 	UUID      string
 	Name      string
