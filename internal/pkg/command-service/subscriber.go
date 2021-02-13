@@ -25,8 +25,29 @@ func (i InMemoryDb) CreateNewAuction(auction domain.Auction) error {
 	return nil
 }
 
-func (i InMemoryDb) UpdateAuctionState(auction domain.Auction) error {
-	fmt.Printf("updating auction %v \n", auction)
+func (i InMemoryDb) UpdateState(context context.Context,
+	event domain.AuctionEvent,
+	update func(auction domain.Auction) (domain.Auction, error),
+) error {
+	fmt.Println("Update state")
+	return nil
+}
+
+func (i InMemoryDb) IsHighestUserBid(
+	context context.Context,
+	bid domain.BidPlaced,
+	validate func(userHighestBid domain.Bid) bool,
+) bool {
+	fmt.Println("Is Highest user bid called")
+	return true
+}
+
+func (i InMemoryDb) IsHighestAuctionBid(
+	ctx context.Context,
+	auctionId string,
+	onHighestBid func(topBid domain.Bid, secondBid domain.Bid) error,
+) error {
+	fmt.Println("Highest auction called")
 	return nil
 }
 
@@ -35,7 +56,7 @@ func (i InMemoryDb) SaveBidEvent(event domain.BidEventRaw) error {
 	return nil
 }
 
-func (i InMemoryDb) CreateBid(event domain.BidPlaced) error {
+func (i InMemoryDb) SaveBid(event domain.BidPlaced) error {
 	fmt.Printf("create bid placed %v \n", event)
 	return nil
 }
@@ -57,8 +78,10 @@ func StartSubscriber(url string, parentWg *sync.WaitGroup) {
 		Commands: app.Commands{
 			CreateAuction:    command.CreateAuctionHandler{Repo: InMemoryDb{}},
 			SaveAuctionEvent: command.SaveAuctionEventHandler{Repo: InMemoryDb{}},
-			UpdateState:      command.UpdateStateHandler{Repo: InMemoryDb{}},
 			SaveBidEvent:     command.SaveBidEventHandler{Repo: InMemoryDb{}},
+			PlaceBid:         command.PlaceBidHandler{BidRepo: InMemoryDb{}, StateRepo: InMemoryDb{}},
+			DeleteBid:        command.DeleteBidHandler{BidRepo: InMemoryDb{}, StateRepo: InMemoryDb{}},
+			AnnounceWinner:   command.AnnounceWinner{Repo: InMemoryDb{}},
 		},
 	}
 

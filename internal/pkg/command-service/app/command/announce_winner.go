@@ -6,11 +6,11 @@ import (
 )
 
 type AnnounceWinner struct {
-	repo StateRepository
+	Repo StateRepository
 }
 
 func (a AnnounceWinner) Handle(ctx context.Context, winnerMessage domain.WinnerAnnounced) error {
-	return a.repo.UpdateState(ctx, winnerMessage, func(currentState domain.Auction) (domain.Auction, error) {
+	return a.Repo.UpdateState(ctx, winnerMessage, func(currentState domain.Auction) (domain.Auction, error) {
 		return domain.ApplyOnSnapshot(currentState, winnerMessage), nil
 	})
 }
