@@ -23,8 +23,13 @@ type BidRepository interface {
 	IsHighestUserBid(
 		context context.Context,
 		bid domain.BidPlaced,
-		validate func(highestBid domain.Bid) bool,
+		validate func(userHighestBid domain.Bid) bool,
 	) bool
+	IsHighestAuctionBid(
+		ctx context.Context,
+		auctionId string,
+		onHighestBid func(topBid domain.Bid, secondBid domain.Bid) error,
+	) error
 	SaveBid(bid domain.BidPlaced) error
 	DeleteBid(bid domain.BidDeleted) error
 }

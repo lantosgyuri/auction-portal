@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/app"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/app/command"
-	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/app/query"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/domain"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/event-reaction"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/connection"
@@ -46,17 +45,6 @@ func (i InMemoryDb) DeleteBid(event domain.BidDeleted) error {
 	return nil
 }
 
-func (I InMemoryDb) FindAuction(ctx context.Context, auctionID string) (domain.Auction, error) {
-	return domain.Auction{
-		UUID:        "t",
-		Name:        "Test",
-		StartDate:   1,
-		DueDate:     2,
-		CurrentBid:  0,
-		CurrentUser: 0,
-	}, nil
-}
-
 func StartSubscriber(url string, parentWg *sync.WaitGroup) {
 	wg := sync.WaitGroup{}
 	wg.Add(1)
@@ -71,11 +59,6 @@ func StartSubscriber(url string, parentWg *sync.WaitGroup) {
 			SaveAuctionEvent: command.SaveAuctionEventHandler{Repo: InMemoryDb{}},
 			UpdateState:      command.UpdateStateHandler{Repo: InMemoryDb{}},
 			SaveBidEvent:     command.SaveBidEventHandler{Repo: InMemoryDb{}},
-		},
-		Queries: app.Queries{
-			GetAuctionState: query.AuctionStateHandler{
-				Reader: InMemoryDb{},
-			},
 		},
 	}
 
