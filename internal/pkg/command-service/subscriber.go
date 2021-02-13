@@ -36,6 +36,16 @@ func (i InMemoryDb) SaveBidEvent(event domain.BidEventRaw) error {
 	return nil
 }
 
+func (i InMemoryDb) CreateBid(event domain.BidPlaced) error {
+	fmt.Printf("create bid placed %v \n", event)
+	return nil
+}
+
+func (i InMemoryDb) DeleteBid(event domain.BidDeleted) error {
+	fmt.Printf("delete bid %v \n", event)
+	return nil
+}
+
 func (I InMemoryDb) FindAuction(ctx context.Context, auctionID string) (domain.Auction, error) {
 	return domain.Auction{
 		UUID:        "t",

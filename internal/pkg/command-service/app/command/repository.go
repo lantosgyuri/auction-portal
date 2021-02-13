@@ -1,11 +1,21 @@
 package command
 
-import "github.com/lantosgyuri/auction-portal/internal/pkg/command-service/domain"
+import (
+	"context"
+	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/domain"
+)
 
 type AuctionRepository interface {
 	SaveAuctionEvent(event domain.AuctionEventRaw) error
-	UpdateAuctionState(event domain.Auction) error
 	CreateNewAuction(auction domain.Auction) error
+}
+
+type StateRepository interface {
+	UpdateState(
+		context context.Context,
+		event domain.AuctionEvent,
+		update func(auction domain.Auction) domain.Auction,
+	) error
 }
 
 type BidRepository interface {

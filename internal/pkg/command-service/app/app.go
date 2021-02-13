@@ -13,10 +13,10 @@ type Application struct {
 type Commands struct {
 	CreateAuction    command.CreateAuctionHandler
 	SaveAuctionEvent command.SaveAuctionEventHandler
-	UpdateState      command.UpdateStateHandler
 	SaveBidEvent     command.SaveBidEventHandler
 	CreateBid        command.CreateBidHandler
 	DeleteBid        command.DeleteBidHandler
+	AnnounceWinner   command.AnnounceWinner
 }
 
 type Queries struct {
