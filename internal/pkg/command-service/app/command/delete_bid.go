@@ -25,12 +25,12 @@ func (d DeleteBidHandler) Handle(ctx context.Context, deletedBid domain.BidDelet
 					deletedBid.UserId = secondBid.UserId
 					deletedBid.Amount = secondBid.Amount
 				}
+			}
 
-				if updateErr := d.StateRepo.UpdateState(ctx, deletedBid, func(auction domain.Auction) (domain.Auction, error) {
-					return domain.ApplyOnSnapshot(auction, deletedBid), nil
-				}); updateErr != nil {
-					return updateErr
-				}
+			if updateErr := d.StateRepo.UpdateState(ctx, deletedBid, func(auction domain.Auction) (domain.Auction, error) {
+				return domain.ApplyOnSnapshot(auction, deletedBid), nil
+			}); updateErr != nil {
+				return updateErr
 			}
 			return nil
 		}); err != nil {
