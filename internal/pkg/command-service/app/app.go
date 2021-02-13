@@ -14,7 +14,7 @@ type Commands struct {
 	CreateAuction    command.CreateAuctionHandler
 	SaveAuctionEvent command.SaveAuctionEventHandler
 	SaveBidEvent     command.SaveBidEventHandler
-	CreateBid        command.CreateBidHandler
+	PlaceBid         command.PlaceBidHandler
 	DeleteBid        command.DeleteBidHandler
 	AnnounceWinner   command.AnnounceWinner
 }

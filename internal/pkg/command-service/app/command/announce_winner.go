@@ -10,7 +10,7 @@ type AnnounceWinner struct {
 }
 
 func (a AnnounceWinner) Handle(ctx context.Context, winnerMessage domain.WinnerAnnounced) error {
-	return a.repo.UpdateState(ctx, winnerMessage, func(currentState domain.Auction) domain.Auction {
-		return domain.ApplyOnSnapshot(currentState, winnerMessage)
+	return a.repo.UpdateState(ctx, winnerMessage, func(currentState domain.Auction) (domain.Auction, error) {
+		return domain.ApplyOnSnapshot(currentState, winnerMessage), nil
 	})
 }

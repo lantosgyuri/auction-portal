@@ -14,13 +14,18 @@ type StateRepository interface {
 	UpdateState(
 		context context.Context,
 		event domain.AuctionEvent,
-		update func(auction domain.Auction) domain.Auction,
+		update func(auction domain.Auction) (domain.Auction, error),
 	) error
 }
 
 type BidRepository interface {
 	SaveBidEvent(event domain.BidEventRaw) error
-	CreateBid(bid domain.BidPlaced) error
+	IsHighestUserBid(
+		context context.Context,
+		bid domain.BidPlaced,
+		validate func(highestBid domain.Bid) bool,
+	) bool
+	SaveBid(bid domain.BidPlaced) error
 	DeleteBid(bid domain.BidDeleted) error
 }
 
