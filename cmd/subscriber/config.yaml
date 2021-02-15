@@ -1,5 +1,0 @@
-redis:
-  url: redis://localhost:6364
-  subscriptions:
-    - bid
-    - user

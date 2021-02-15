@@ -96,6 +96,26 @@ func TestDeleteBidHighestCanNotFallback(t *testing.T) {
 	assertResults(t, err, mStateRepo.state, 0, 0, 2)
 }
 
+func TestDeleteBidNotHighest(t *testing.T) {
+	mockedHighest := func(ctx context.Context, auctionId string,
+		onHighestBid func(topBid domain.Bid, secondBid domain.Bid) error,
+	) error {
+		return onHighestBid(domain.Bid{
+			Amount: 8,
+			UserId: 9,
+		}, domain.Bid{
+			Amount: 7,
+			UserId: 12,
+		})
+	}
+
+	handler := createHandler(mockedHighest)
+
+	err := handler.Handle(context.Background(), message)
+
+	assertResults(t, err, mStateRepo.state, 0, 0, 3)
+}
+
 func createHandler(callback isHighestAuctionBid) command.DeleteBidHandler {
 	mRepo := mockedBRepo{
 		isHighestAuctionBidCallback: callback,
