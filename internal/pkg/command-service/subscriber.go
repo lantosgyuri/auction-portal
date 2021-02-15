@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/adapter"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/app"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/app/command"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/domain"
@@ -11,60 +12,6 @@ import (
 	"github.com/lantosgyuri/auction-portal/internal/pkg/connection"
 	"sync"
 )
-
-type InMemoryDb struct {
-}
-
-func (i InMemoryDb) SaveAuctionEvent(event domain.AuctionEventRaw) error {
-	fmt.Printf("saving auction event %v \n", event)
-	return nil
-}
-
-func (i InMemoryDb) CreateNewAuction(auction domain.Auction) error {
-	fmt.Printf("saving auction %v \n", auction)
-	return nil
-}
-
-func (i InMemoryDb) UpdateState(context context.Context,
-	event domain.AuctionEvent,
-	update func(auction domain.Auction) (domain.Auction, error),
-) error {
-	fmt.Println("Update state")
-	return nil
-}
-
-func (i InMemoryDb) IsHighestUserBid(
-	context context.Context,
-	bid domain.BidPlaced,
-	validate func(userHighestBid domain.Bid) bool,
-) bool {
-	fmt.Println("Is Highest user bid called")
-	return true
-}
-
-func (i InMemoryDb) IsHighestAuctionBid(
-	ctx context.Context,
-	auctionId string,
-	onHighestBid func(topBid domain.Bid, secondBid domain.Bid) error,
-) error {
-	fmt.Println("Highest auction called")
-	return nil
-}
-
-func (i InMemoryDb) SaveBidEvent(event domain.BidEventRaw) error {
-	fmt.Printf("saving bid event %v \n", event)
-	return nil
-}
-
-func (i InMemoryDb) SaveBid(event domain.BidPlaced) error {
-	fmt.Printf("create bid placed %v \n", event)
-	return nil
-}
-
-func (i InMemoryDb) DeleteBid(event domain.BidDeleted) error {
-	fmt.Printf("delete bid %v \n", event)
-	return nil
-}
 
 func StartSubscriber(url string, parentWg *sync.WaitGroup) {
 	wg := sync.WaitGroup{}
@@ -76,12 +23,8 @@ func StartSubscriber(url string, parentWg *sync.WaitGroup) {
 
 	application := app.Application{
 		Commands: app.Commands{
-			CreateAuction:    command.CreateAuctionHandler{Repo: InMemoryDb{}},
-			SaveAuctionEvent: command.SaveAuctionEventHandler{Repo: InMemoryDb{}},
-			SaveBidEvent:     command.SaveBidEventHandler{Repo: InMemoryDb{}},
-			PlaceBid:         command.PlaceBidHandler{BidRepo: InMemoryDb{}, StateRepo: InMemoryDb{}},
-			DeleteBid:        command.DeleteBidHandler{BidRepo: InMemoryDb{}, StateRepo: InMemoryDb{}},
-			AnnounceWinner:   command.AnnounceWinnerHandler{Repo: InMemoryDb{}},
+			CreateAuction:    command.CreateAuctionHandler{Repo: adapter.MariaDbAuctionRepository{Db: connection.SotDb}},
+			SaveAuctionEvent: command.SaveAuctionEventHandler{Repo: adapter.MariaDbAuctionRepository{Db: connection.SotDb}},
 		},
 	}
 

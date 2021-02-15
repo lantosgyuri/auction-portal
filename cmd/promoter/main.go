@@ -62,57 +62,58 @@ func publish() {
 	messageBytes, _ := json.Marshal(event)
 
 	redisConn.Publish(ctx, "Auction", messageBytes)
+	/*
+		winner := domain.WinnerAnnounced{
+			Timestamp: int(time.Now().Unix()),
+			WinnerId:  19880,
+			AuctionId: "test",
+		}
 
-	winner := domain.WinnerAnnounced{
-		Timestamp: int(time.Now().Unix()),
-		WinnerId:  19880,
-		AuctionId: "test",
-	}
+		winnerBytes, _ := json.Marshal(winner)
 
-	winnerBytes, _ := json.Marshal(winner)
+		eventWinner := Event{
+			Event:   domain.AuctionWinnerAnnounced,
+			Payload: winnerBytes,
+		}
 
-	eventWinner := Event{
-		Event:   domain.AuctionWinnerAnnounced,
-		Payload: winnerBytes,
-	}
+		winnerMessageBytes, _ := json.Marshal(eventWinner)
 
-	winnerMessageBytes, _ := json.Marshal(eventWinner)
+		redisConn.Publish(ctx, "Auction", winnerMessageBytes)
 
-	redisConn.Publish(ctx, "Auction", winnerMessageBytes)
+		bidPLaced := domain.BidPlaced{
+			Promoted:  false,
+			Amount:    20,
+			UserId:    41,
+			AuctionId: "test",
+		}
 
-	bidPLaced := domain.BidPlaced{
-		Promoted:  false,
-		Amount:    20,
-		UserId:    41,
-		AuctionId: "test",
-	}
+		bidPLacedbytes, _ := json.Marshal(bidPLaced)
 
-	bidPLacedbytes, _ := json.Marshal(bidPLaced)
+		bidPlacedEvent := Event{
+			Event:   domain.BidPlaceRequested,
+			Payload: bidPLacedbytes,
+		}
 
-	bidPlacedEvent := Event{
-		Event:   domain.BidPlaceRequested,
-		Payload: bidPLacedbytes,
-	}
+		bidPLacedEvetnBytes, _ := json.Marshal(bidPlacedEvent)
 
-	bidPLacedEvetnBytes, _ := json.Marshal(bidPlacedEvent)
+		redisConn.Publish(ctx, "Bid", bidPLacedEvetnBytes)
 
-	redisConn.Publish(ctx, "Bid", bidPLacedEvetnBytes)
+		bidDeleted := domain.BidDeleted{
+			BidId:     40,
+			Amount:    20,
+			UserId:    41,
+			AuctionId: "test",
+		}
 
-	bidDeleted := domain.BidDeleted{
-		BidId:     40,
-		Amount:    20,
-		UserId:    41,
-		AuctionId: "test",
-	}
+		bidDeletedbytes, _ := json.Marshal(bidDeleted)
 
-	bidDeletedbytes, _ := json.Marshal(bidDeleted)
+		bidDeletedEcent := Event{
+			Event:   domain.BidDeleteRequested,
+			Payload: bidDeletedbytes,
+		}
 
-	bidDeletedEcent := Event{
-		Event:   domain.BidDeleteRequested,
-		Payload: bidDeletedbytes,
-	}
+		bidDeletedEvetnBytes, _ := json.Marshal(bidDeletedEcent)
 
-	bidDeletedEvetnBytes, _ := json.Marshal(bidDeletedEcent)
-
-	redisConn.Publish(ctx, "Bid", bidDeletedEvetnBytes)
+		redisConn.Publish(ctx, "Bid", bidDeletedEvetnBytes)
+	*/
 }

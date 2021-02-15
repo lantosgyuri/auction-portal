@@ -1,4 +1,4 @@
-package mariadb
+package adapter
 
 import (
 	"fmt"
