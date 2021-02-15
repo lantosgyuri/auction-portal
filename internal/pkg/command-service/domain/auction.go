@@ -1,5 +1,7 @@
 package domain
 
+import "gorm.io/gorm"
+
 type AuctionEvent interface {
 	GetAuctionId() string
 }
@@ -37,6 +39,7 @@ func (w WinnerAnnounced) GetAuctionId() string {
 }
 
 type Auction struct {
+	gorm.Model
 	UUID             string
 	Name             string
 	DueDate          int

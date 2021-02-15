@@ -35,5 +35,7 @@ type BidRepository interface {
 }
 
 type UserRepository interface {
-	SaveUserEvent() error
+	SaveUserEvent(event domain.UserEventRaw) error
+	CreateUser(user domain.CreateUserRequested) error
+	DeleteUser(user domain.DeleteUserRequest) error
 }

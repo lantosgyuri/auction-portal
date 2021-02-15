@@ -81,7 +81,7 @@ func StartSubscriber(url string, parentWg *sync.WaitGroup) {
 			SaveBidEvent:     command.SaveBidEventHandler{Repo: InMemoryDb{}},
 			PlaceBid:         command.PlaceBidHandler{BidRepo: InMemoryDb{}, StateRepo: InMemoryDb{}},
 			DeleteBid:        command.DeleteBidHandler{BidRepo: InMemoryDb{}, StateRepo: InMemoryDb{}},
-			AnnounceWinner:   command.AnnounceWinner{Repo: InMemoryDb{}},
+			AnnounceWinner:   command.AnnounceWinnerHandler{Repo: InMemoryDb{}},
 		},
 	}
 

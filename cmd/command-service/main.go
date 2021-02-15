@@ -2,6 +2,7 @@ package main
 
 import (
 	command_service "github.com/lantosgyuri/auction-portal/internal/pkg/command-service"
+	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/adapter/mariadb"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/connection"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/input"
 	"gopkg.in/yaml.v3"
@@ -41,6 +42,7 @@ func main() {
 
 	connection.InitializeMariaDb(conf.SotDbConf.Dsn)
 	defer connection.CloseMariDb()
+	mariadb.MigrateSotDb(&wg)
 
 	command_service.StartSubscriber(conf.RedisConf.Url, &wg)
 	wg.Wait()
