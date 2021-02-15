@@ -32,7 +32,6 @@ func TestErrorCases(t *testing.T) {
 			message: domain.CreateAuctionRequested{
 				DueDate:   int(time.Now().AddDate(0, 0, -1).Unix()),
 				StartDate: int(time.Now().AddDate(0, 0, 2).Unix()),
-				Timestamp: int(time.Now().Unix()),
 				Name:      "Test",
 			},
 			errorMessage: "not valid DueDate.",
@@ -41,7 +40,6 @@ func TestErrorCases(t *testing.T) {
 			message: domain.CreateAuctionRequested{
 				DueDate:   int(time.Now().AddDate(0, 0, 7).Unix()),
 				StartDate: int(time.Now().AddDate(0, 0, -1).Unix()),
-				Timestamp: int(time.Now().Unix()),
 				Name:      "Test",
 			},
 			errorMessage: "not valid StartDate.",
@@ -50,7 +48,6 @@ func TestErrorCases(t *testing.T) {
 			message: domain.CreateAuctionRequested{
 				DueDate:   int(time.Now().AddDate(0, 0, 6).Unix()),
 				StartDate: int(time.Now().AddDate(0, 0, 7).Unix()),
-				Timestamp: int(time.Now().Unix()),
 				Name:      "Test",
 			},
 			errorMessage: "invalid dates",

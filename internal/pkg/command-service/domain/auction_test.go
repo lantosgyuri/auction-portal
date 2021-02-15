@@ -10,7 +10,6 @@ var messageCreate = CreateAuctionRequested{
 	Name:      "Test",
 	StartDate: 1,
 	DueDate:   2,
-	Timestamp: 3,
 }
 
 var snapshot = Auction{
