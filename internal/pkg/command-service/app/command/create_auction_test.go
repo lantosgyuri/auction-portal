@@ -2,24 +2,15 @@ package command_test
 
 import (
 	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/app/command"
+	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/app/command/mocks"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/domain"
 	"github.com/stretchr/testify/assert"
 	"testing"
 	"time"
 )
 
-type mockedRepo struct{}
-
-func (m mockedRepo) SaveAuctionEvent(event domain.AuctionEventRaw) error {
-	return nil
-}
-
-func (m mockedRepo) CreateNewAuction(auction domain.Auction) error {
-	return nil
-}
-
 var handler = command.CreateAuctionHandler{
-	Repo: mockedRepo{},
+	Repo: &mocks.AuctionRepository{},
 }
 
 type errorTest struct {

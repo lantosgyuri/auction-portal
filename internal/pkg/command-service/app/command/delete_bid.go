@@ -26,7 +26,6 @@ func (d DeleteBidHandler) Handle(ctx context.Context, deletedBid domain.BidDelet
 					deletedBid.Amount = secondBid.Amount
 				}
 			}
-
 			if updateErr := d.StateRepo.UpdateState(ctx, deletedBid, func(auction domain.Auction) (domain.Auction, error) {
 				return domain.ApplyOnSnapshot(auction, deletedBid), nil
 			}); updateErr != nil {
