@@ -25,5 +25,5 @@ func (m MariaDbStateRepository) UpdateState(
 		return err
 	}
 
-	return m.Db.Save(&newState).Error
+	return m.Db.Model(&newState).Updates(newState).Error
 }

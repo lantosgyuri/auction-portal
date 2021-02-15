@@ -2,4 +2,4 @@ redis:
   url: redis://localhost:6364
 
 sotDb:
-  dsn: root:root@tcp(127.0.0.1:3306)/sot
+  dsn: root:root@tcp(127.0.0.1:3306)/sot?parseTime=true
