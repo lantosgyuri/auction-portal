@@ -10,11 +10,9 @@ type MariaDbAuctionRepository struct {
 }
 
 func (m MariaDbAuctionRepository) SaveAuctionEvent(event domain.AuctionEventRaw) error {
-	m.Db.Create(&event)
-	return nil
+	return m.Db.Create(&event).Error
 }
 
 func (m MariaDbAuctionRepository) CreateNewAuction(auction domain.Auction) error {
-	m.Db.Create(&auction)
-	return nil
+	return m.Db.Create(&auction).Error
 }

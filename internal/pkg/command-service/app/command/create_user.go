@@ -19,5 +19,10 @@ func (c CreateUserHandler) Handle(userRequest domain.CreateUserRequested) error 
 		return errors.New("no password is set")
 	}
 
-	return c.Repo.CreateUser(userRequest)
+	user := domain.User{
+		Name:     userRequest.Name,
+		Password: userRequest.Password,
+	}
+
+	return c.Repo.CreateUser(user)
 }

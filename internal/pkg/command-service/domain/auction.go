@@ -15,7 +15,6 @@ type AuctionEventRaw struct {
 	DueDate   int
 	StartDate int
 	Winner    int
-	Timestamp int
 }
 
 type CreateAuctionRequested struct {
@@ -23,7 +22,6 @@ type CreateAuctionRequested struct {
 	Name      string
 	DueDate   int
 	StartDate int
-	Timestamp int
 }
 
 func (c CreateAuctionRequested) GetAuctionId() string {
@@ -33,7 +31,6 @@ func (c CreateAuctionRequested) GetAuctionId() string {
 type WinnerAnnounced struct {
 	AuctionId string
 	WinnerId  int
-	Timestamp int
 }
 
 func (w WinnerAnnounced) GetAuctionId() string {

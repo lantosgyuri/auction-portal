@@ -30,7 +30,6 @@ type UserEventRaw struct {
 	UserId    int
 	Name      string
 	Password  string
-	TimeStamp int
 }
 
 func (c CreateUserRequested) GetName() string {

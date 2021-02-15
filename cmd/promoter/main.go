@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"github.com/go-redis/redis/v8"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/domain"
-	"time"
 )
 
 var ctx = context.Background()
@@ -44,24 +43,90 @@ func CreateRedisClient() *redis.Client {
 
 func publish() {
 	redisConn := CreateRedisClient()
+	/*
+			auction := CreateAuction{
+				DueDate:   int(time.Now().AddDate(0, 0, 7).Unix()),
+				StartDate: int(time.Now().AddDate(0, 0, 2).Unix()),
+				Timestamp: int(time.Now().Unix()),
+				Name:      "JOZSIKA",
+			}
 
-	user := CreateAuction{
-		DueDate:   int(time.Now().AddDate(0, 0, 7).Unix()),
-		StartDate: int(time.Now().AddDate(0, 0, 2).Unix()),
-		Timestamp: int(time.Now().Unix()),
-		Name:      "JOZSIKA",
+			userBytes, _ := json.Marshal(auction)
+
+			event := Event{
+				Event:   domain.AuctionRequested,
+				Payload: userBytes,
+			}
+
+			messageBytes, _ := json.Marshal(event)
+
+			redisConn.Publish(ctx, "Auction", messageBytes)
+
+		user := domain.CreateUserRequested{
+			Name:     "Johanna",
+			Password: "Secret",
+		}
+
+		userCreateBytes, _ := json.Marshal(user)
+
+		eventJohannaCreate := Event{
+			Event:   domain.UserCreateRequested,
+			Payload: userCreateBytes,
+		}
+
+		johannaBytes, _ := json.Marshal(eventJohannaCreate)
+
+		redisConn.Publish(ctx, "User", johannaBytes)
+
+		userIvan := domain.CreateUserRequested{
+			Name:     "Ivan",
+			Password: "Top Secret",
+		}
+
+		userIvanCreateBytes, _ := json.Marshal(userIvan)
+
+		eventIvanCreate := Event{
+			Event:   domain.UserCreateRequested,
+			Payload: userIvanCreateBytes,
+		}
+
+		ivanBytes, _ := json.Marshal(eventIvanCreate)
+
+		redisConn.Publish(ctx, "User", ivanBytes)
+
+		userME := domain.CreateUserRequested{
+			Name:     "Gyorgy",
+			Password: "Top Secret",
+		}
+
+		userMECreateBytes, _ := json.Marshal(userME)
+
+		eventMECreate := Event{
+			Event:   domain.UserCreateRequested,
+			Payload: userMECreateBytes,
+		}
+
+		meBytes, _ := json.Marshal(eventMECreate)
+
+		redisConn.Publish(ctx, "User", meBytes)
+	*/
+
+	userME := domain.DeleteUserRequest{
+		Name: "Gyorgy",
+		Id:   3,
 	}
 
-	userBytes, _ := json.Marshal(user)
+	userMECreateBytes, _ := json.Marshal(userME)
 
-	event := Event{
-		Event:   domain.AuctionRequested,
-		Payload: userBytes,
+	eventMECreate := Event{
+		Event:   domain.UserDeleteRequested,
+		Payload: userMECreateBytes,
 	}
 
-	messageBytes, _ := json.Marshal(event)
+	meBytes, _ := json.Marshal(eventMECreate)
 
-	redisConn.Publish(ctx, "Auction", messageBytes)
+	redisConn.Publish(ctx, "User", meBytes)
+
 	/*
 		winner := domain.WinnerAnnounced{
 			Timestamp: int(time.Now().Unix()),

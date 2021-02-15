@@ -7,5 +7,8 @@ type DeleteUserHandler struct {
 }
 
 func (d DeleteUserHandler) Handle(request domain.DeleteUserRequest) error {
-	return d.Repo.DeleteUser(request)
+	return d.Repo.DeleteUser(domain.User{
+		Name: request.Name,
+		Id:   request.Id,
+	})
 }
