@@ -1,5 +1,7 @@
 package domain
 
+import "gorm.io/gorm"
+
 type UserEvent interface {
 	GetName() string
 }
@@ -15,12 +17,15 @@ type DeleteUserRequest struct {
 }
 
 type User struct {
-	Id       int
+	gorm.Model
+	Id       int `gorm:"primaryKey"`
 	Name     string
 	Password string
 }
 
 type UserEventRaw struct {
+	gorm.Model
+	Id        int `gorm:"primaryKey"`
 	EventType string
 	UserId    int
 	Name      string

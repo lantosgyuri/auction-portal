@@ -1,18 +1,25 @@
 package domain
 
+import "gorm.io/gorm"
+
 type BidEvent interface {
 	GetUserId() int
 }
 
 type Bid struct {
-	Id        int
+	gorm.Model
+	Id        int `gorm:"primaryKey"`
 	UserId    int
 	AuctionId string
 	Promoted  bool
 	Amount    int
+	Auction   Auction `gorm:"foreignKey:AuctionId"`
+	User      User    `gorm:"foreignKey:UserId"`
 }
 
 type BidEventRaw struct {
+	gorm.Model
+	Id        int `gorm:"primaryKey"`
 	AuctionId string
 	UserId    int
 	EventType string

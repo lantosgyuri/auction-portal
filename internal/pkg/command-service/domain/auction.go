@@ -7,6 +7,8 @@ type AuctionEvent interface {
 }
 
 type AuctionEventRaw struct {
+	gorm.Model
+	Id        int `gorm:"primaryKey"`
 	EventType string
 	Name      string
 	AuctionId string
@@ -40,7 +42,7 @@ func (w WinnerAnnounced) GetAuctionId() string {
 
 type Auction struct {
 	gorm.Model
-	UUID             string
+	UUID             string `gorm:"primaryKey"`
 	Name             string
 	DueDate          int
 	StartDate        int
