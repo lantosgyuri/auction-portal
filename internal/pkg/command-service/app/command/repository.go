@@ -30,8 +30,8 @@ type BidRepository interface {
 		auctionId string,
 		onHighestBid func(topBid domain.Bid, secondBid domain.Bid) error,
 	) error
-	SaveBid(bid domain.BidPlaced) error
-	DeleteBid(bid domain.BidDeleted) error
+	SaveBid(bid domain.Bid) error
+	DeleteBid(bid domain.Bid) error
 }
 
 type UserRepository interface {

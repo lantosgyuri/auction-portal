@@ -22,7 +22,14 @@ func (p PlaceBidHandler) Handle(ctx context.Context, bid domain.BidPlaced) error
 		return errors.New("bid is smaller than latest bid")
 	}
 
-	if err := p.BidRepo.SaveBid(bid); err != nil {
+	b := domain.Bid{
+		UserId:    bid.UserId,
+		Amount:    bid.Amount,
+		Promoted:  bid.Promoted,
+		AuctionId: bid.AuctionId,
+	}
+
+	if err := p.BidRepo.SaveBid(b); err != nil {
 		return errors.New(fmt.Sprintf("can not save bid: %v", err))
 	}
 

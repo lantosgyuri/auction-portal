@@ -36,7 +36,13 @@ func (d DeleteBidHandler) Handle(ctx context.Context, deletedBid domain.BidDelet
 		return errors.New(fmt.Sprintf("can not validate delete request:  %v", err))
 	}
 
-	return d.BidRepo.DeleteBid(deletedBid)
+	bid := domain.Bid{
+		AuctionId: deletedBid.AuctionId,
+		UserId:    deletedBid.UserId,
+		Amount:    deletedBid.Amount,
+	}
+
+	return d.BidRepo.DeleteBid(bid)
 }
 
 func isHighestBidFromUser(topBid domain.Bid, deletedBid domain.BidDeleted) bool {

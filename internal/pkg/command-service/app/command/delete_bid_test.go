@@ -29,10 +29,10 @@ func (m mockedBRepo) IsHighestAuctionBid(ctx context.Context, auctionId string,
 ) error {
 	return m.isHighestAuctionBidCallback(ctx, auctionId, onHighestBid)
 }
-func (m mockedBRepo) SaveBid(bid domain.BidPlaced) error {
+func (m mockedBRepo) SaveBid(bid domain.Bid) error {
 	return nil
 }
-func (m mockedBRepo) DeleteBid(bid domain.BidDeleted) error {
+func (m mockedBRepo) DeleteBid(bid domain.Bid) error {
 	return nil
 }
 

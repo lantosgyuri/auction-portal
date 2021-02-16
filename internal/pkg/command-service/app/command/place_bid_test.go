@@ -37,10 +37,10 @@ func (m mockedBidRepo) IsHighestAuctionBid(ctx context.Context, auctionId string
 	return nil
 }
 
-func (m mockedBidRepo) SaveBid(bid domain.BidPlaced) error {
+func (m mockedBidRepo) SaveBid(bid domain.Bid) error {
 	return nil
 }
-func (m mockedBidRepo) DeleteBid(bid domain.BidDeleted) error {
+func (m mockedBidRepo) DeleteBid(bid domain.Bid) error {
 	return nil
 }
 
