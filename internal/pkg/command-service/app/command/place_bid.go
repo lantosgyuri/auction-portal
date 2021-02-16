@@ -14,6 +14,7 @@ type PlaceBidHandler struct {
 
 func (p PlaceBidHandler) Handle(ctx context.Context, bid domain.BidPlaced) error {
 
+	// TODO check for: bid valid in time -> Auction Repo
 	highestBid := p.BidRepo.IsHighestUserBid(ctx, bid, func(highestBid domain.Bid) bool {
 		return bid.Amount > highestBid.Amount
 	})

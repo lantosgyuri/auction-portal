@@ -44,65 +44,81 @@ func CreateRedisClient() *redis.Client {
 func publish() {
 	redisConn := CreateRedisClient()
 	/*
-				auction := CreateAuction{
-					DueDate:   int(time.Now().AddDate(0, 0, 7).Unix()),
-					StartDate: int(time.Now().AddDate(0, 0, 2).Unix()),
-					Timestamp: int(time.Now().Unix()),
-					Name:      "JOZSIKA",
+					auction := CreateAuction{
+						DueDate:   int(time.Now().AddDate(0, 0, 7).Unix()),
+						StartDate: int(time.Now().AddDate(0, 0, 2).Unix()),
+						Timestamp: int(time.Now().Unix()),
+						Name:      "JOZSIKA",
+					}
+
+					userBytes, _ := json.Marshal(auction)
+
+					event := Event{
+						Event:   domain.AuctionRequested,
+						Payload: userBytes,
+					}
+
+					messageBytes, _ := json.Marshal(event)
+
+					redisConn.Publish(ctx, "Auction", messageBytes)
+
+				user := domain.CreateUserRequested{
+					Name:     "Johanna",
+					Password: "Secret",
 				}
 
-				userBytes, _ := json.Marshal(auction)
+				userCreateBytes, _ := json.Marshal(user)
 
-				event := Event{
-					Event:   domain.AuctionRequested,
-					Payload: userBytes,
+				eventJohannaCreate := Event{
+					Event:   domain.UserCreateRequested,
+					Payload: userCreateBytes,
 				}
 
-				messageBytes, _ := json.Marshal(event)
+				johannaBytes, _ := json.Marshal(eventJohannaCreate)
 
-				redisConn.Publish(ctx, "Auction", messageBytes)
+				redisConn.Publish(ctx, "User", johannaBytes)
 
-			user := domain.CreateUserRequested{
-				Name:     "Johanna",
-				Password: "Secret",
-			}
+				userIvan := domain.CreateUserRequested{
+					Name:     "Ivan",
+					Password: "Top Secret",
+				}
 
-			userCreateBytes, _ := json.Marshal(user)
+				userIvanCreateBytes, _ := json.Marshal(userIvan)
 
-			eventJohannaCreate := Event{
-				Event:   domain.UserCreateRequested,
-				Payload: userCreateBytes,
-			}
+				eventIvanCreate := Event{
+					Event:   domain.UserCreateRequested,
+					Payload: userIvanCreateBytes,
+				}
 
-			johannaBytes, _ := json.Marshal(eventJohannaCreate)
+				ivanBytes, _ := json.Marshal(eventIvanCreate)
 
-			redisConn.Publish(ctx, "User", johannaBytes)
+				redisConn.Publish(ctx, "User", ivanBytes)
 
-			userIvan := domain.CreateUserRequested{
-				Name:     "Ivan",
-				Password: "Top Secret",
-			}
+				userME := domain.CreateUserRequested{
+					Name:     "Gyorgy",
+					Password: "Top Secret",
+				}
 
-			userIvanCreateBytes, _ := json.Marshal(userIvan)
+				userMECreateBytes, _ := json.Marshal(userME)
 
-			eventIvanCreate := Event{
-				Event:   domain.UserCreateRequested,
-				Payload: userIvanCreateBytes,
-			}
+				eventMECreate := Event{
+					Event:   domain.UserCreateRequested,
+					Payload: userMECreateBytes,
+				}
 
-			ivanBytes, _ := json.Marshal(eventIvanCreate)
+				meBytes, _ := json.Marshal(eventMECreate)
 
-			redisConn.Publish(ctx, "User", ivanBytes)
+				redisConn.Publish(ctx, "User", meBytes)
 
-			userME := domain.CreateUserRequested{
-				Name:     "Gyorgy",
-				Password: "Top Secret",
+			userME := domain.DeleteUserRequest{
+				Name: "Gyorgy",
+				Id:   3,
 			}
 
 			userMECreateBytes, _ := json.Marshal(userME)
 
 			eventMECreate := Event{
-				Event:   domain.UserCreateRequested,
+				Event:   domain.UserDeleteRequested,
 				Payload: userMECreateBytes,
 			}
 
@@ -110,58 +126,43 @@ func publish() {
 
 			redisConn.Publish(ctx, "User", meBytes)
 
-		userME := domain.DeleteUserRequest{
-			Name: "Gyorgy",
-			Id:   3,
+
+		winner := domain.WinnerAnnounced{
+			WinnerId:  2,
+			AuctionId: "3b1b4a43-005f-4099-9ed8-68b3905ef2c9",
 		}
 
-		userMECreateBytes, _ := json.Marshal(userME)
+		winnerBytes, _ := json.Marshal(winner)
 
-		eventMECreate := Event{
-			Event:   domain.UserDeleteRequested,
-			Payload: userMECreateBytes,
+		eventWinner := Event{
+			Event:   domain.AuctionWinnerAnnounced,
+			Payload: winnerBytes,
 		}
 
-		meBytes, _ := json.Marshal(eventMECreate)
+		winnerMessageBytes, _ := json.Marshal(eventWinner)
 
-		redisConn.Publish(ctx, "User", meBytes)
+		redisConn.Publish(ctx, "Auction", winnerMessageBytes)
 	*/
 
-	winner := domain.WinnerAnnounced{
-		WinnerId:  2,
-		AuctionId: "3b1b4a43-005f-4099-9ed8-68b3905ef2c9",
+	bidPLaced := domain.BidPlaced{
+		Promoted:  false,
+		Amount:    20,
+		UserId:    2,
+		AuctionId: "56bc900f-96fe-42ce-90d2-e5ef1b512157",
 	}
 
-	winnerBytes, _ := json.Marshal(winner)
+	bidPLacedbytes, _ := json.Marshal(bidPLaced)
 
-	eventWinner := Event{
-		Event:   domain.AuctionWinnerAnnounced,
-		Payload: winnerBytes,
+	bidPlacedEvent := Event{
+		Event:   domain.BidPlaceRequested,
+		Payload: bidPLacedbytes,
 	}
 
-	winnerMessageBytes, _ := json.Marshal(eventWinner)
+	bidPLacedEvetnBytes, _ := json.Marshal(bidPlacedEvent)
 
-	redisConn.Publish(ctx, "Auction", winnerMessageBytes)
+	redisConn.Publish(ctx, "Bid", bidPLacedEvetnBytes)
+
 	/*
-
-		bidPLaced := domain.BidPlaced{
-			Promoted:  false,
-			Amount:    20,
-			UserId:    41,
-			AuctionId: "test",
-		}
-
-		bidPLacedbytes, _ := json.Marshal(bidPLaced)
-
-		bidPlacedEvent := Event{
-			Event:   domain.BidPlaceRequested,
-			Payload: bidPLacedbytes,
-		}
-
-		bidPLacedEvetnBytes, _ := json.Marshal(bidPlacedEvent)
-
-		redisConn.Publish(ctx, "Bid", bidPLacedEvetnBytes)
-
 		bidDeleted := domain.BidDeleted{
 			BidId:     40,
 			Amount:    20,
@@ -180,4 +181,5 @@ func publish() {
 
 		redisConn.Publish(ctx, "Bid", bidDeletedEvetnBytes)
 	*/
+
 }

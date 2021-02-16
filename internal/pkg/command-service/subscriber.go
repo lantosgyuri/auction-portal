@@ -29,6 +29,12 @@ func StartSubscriber(url string, parentWg *sync.WaitGroup) {
 			SaveUserEvent:    command.SaveUserEventHandler{Repo: adapter.MariaDbUserRepository{Db: connection.SotDb}},
 			DeleteUser:       command.DeleteUserHandler{Repo: adapter.MariaDbUserRepository{Db: connection.SotDb}},
 			AnnounceWinner:   command.AnnounceWinnerHandler{Repo: adapter.MariaDbStateRepository{Db: connection.SotDb}},
+			PlaceBid: command.PlaceBidHandler{
+				BidRepo:   adapter.MariaDbBidRepository{Db: connection.SotDb},
+				StateRepo: adapter.MariaDbStateRepository{Db: connection.SotDb}},
+			DeleteBid: command.DeleteBidHandler{
+				BidRepo:   adapter.MariaDbBidRepository{Db: connection.SotDb},
+				StateRepo: adapter.MariaDbStateRepository{Db: connection.SotDb}},
 		},
 	}
 

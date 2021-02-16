@@ -13,8 +13,8 @@ type Bid struct {
 	AuctionId string
 	Promoted  bool
 	Amount    int
-	Auction   Auction `gorm:"foreignKey:AuctionId"`
-	User      User    `gorm:"foreignKey:UserId"`
+	Auction   Auction `gorm:"references:UUID"`
+	User      User
 }
 
 type BidEventRaw struct {
