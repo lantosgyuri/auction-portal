@@ -40,9 +40,9 @@ func (d DeleteBidHandler) Handle(ctx context.Context, deletedBid domain.BidDelet
 		AuctionId: deletedBid.AuctionId,
 		UserId:    deletedBid.UserId,
 		Amount:    deletedBid.Amount,
+		Id:        deletedBid.BidId,
 	}
 
-	fmt.Printf("Inside handler bd is %v", bid)
 	return d.BidRepo.DeleteBid(bid)
 }
 
