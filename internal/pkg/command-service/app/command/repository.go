@@ -28,7 +28,7 @@ type BidRepository interface {
 	IsHighestAuctionBid(
 		ctx context.Context,
 		auctionId string,
-		onHighestBid func(topBid domain.Bid, secondBid domain.Bid) error,
+		onHighestBid func(bids []domain.Bid) error,
 	) error
 	SaveBid(bid domain.Bid) error
 	DeleteBid(bid domain.Bid) error

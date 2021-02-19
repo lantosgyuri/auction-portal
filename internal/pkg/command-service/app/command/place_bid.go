@@ -30,7 +30,6 @@ func (p PlaceBidHandler) Handle(ctx context.Context, bid domain.BidPlaced) error
 		AuctionId: bid.AuctionId,
 	}
 
-	// TODO: ALSO SAVE BID EVENT WHEN BID IS SMALLER -> Add new field to the event
 	if err := p.BidRepo.SaveBid(b); err != nil {
 		return errors.New(fmt.Sprintf("can not save bid: %v", err))
 	}

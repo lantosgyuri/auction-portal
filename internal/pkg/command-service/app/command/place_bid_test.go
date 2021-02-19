@@ -32,7 +32,7 @@ func (m mockedBidRepo) IsHighestUserBid(context context.Context, bid domain.BidP
 }
 
 func (m mockedBidRepo) IsHighestAuctionBid(ctx context.Context, auctionId string,
-	onHighestBid func(topBid domain.Bid, secondBid domain.Bid) error,
+	onHighestBid func(topBids []domain.Bid) error,
 ) error {
 	return nil
 }

@@ -9,7 +9,7 @@ import (
 )
 
 type isHighestAuctionBid = func(ctx context.Context, auctionId string,
-	onHighestBid func(topBid domain.Bid, secondBid domain.Bid) error,
+	onHighestBid func(bids []domain.Bid) error,
 ) error
 
 type mockedBRepo struct {
@@ -25,7 +25,7 @@ func (m mockedBRepo) IsHighestUserBid(context context.Context, bid domain.BidPla
 	return false
 }
 func (m mockedBRepo) IsHighestAuctionBid(ctx context.Context, auctionId string,
-	onHighestBid func(topBid domain.Bid, secondBid domain.Bid) error,
+	onHighestBid func(topBids []domain.Bid) error,
 ) error {
 	return m.isHighestAuctionBidCallback(ctx, auctionId, onHighestBid)
 }
@@ -58,15 +58,15 @@ var mStateRepo = mockedStateRepo{
 
 func TestDeleteBidHighestCanFallback(t *testing.T) {
 	mockedHighest := func(ctx context.Context, auctionId string,
-		onHighestBid func(topBid domain.Bid, secondBid domain.Bid) error,
+		onHighestBid func(topBods []domain.Bid) error,
 	) error {
-		return onHighestBid(domain.Bid{
-			Amount: 5,
-			UserId: 4,
-		}, domain.Bid{
-			Amount: 4,
-			UserId: 3,
-		})
+		return onHighestBid([]domain.Bid{
+			{Amount: 5,
+				UserId: 4,
+			}, {
+				Amount: 4,
+				UserId: 3,
+			}})
 	}
 
 	handler := createHandler(mockedHighest)
@@ -78,15 +78,15 @@ func TestDeleteBidHighestCanFallback(t *testing.T) {
 
 func TestDeleteBidHighestCanNotFallback(t *testing.T) {
 	mockedHighest := func(ctx context.Context, auctionId string,
-		onHighestBid func(topBid domain.Bid, secondBid domain.Bid) error,
+		onHighestBid func(topBids []domain.Bid) error,
 	) error {
-		return onHighestBid(domain.Bid{
-			Amount: 5,
-			UserId: 4,
-		}, domain.Bid{
-			Amount: 0,
-			UserId: 0,
-		})
+		return onHighestBid([]domain.Bid{
+			{Amount: 5,
+				UserId: 4,
+			}, {
+				Amount: 0,
+				UserId: 0,
+			}})
 	}
 
 	handler := createHandler(mockedHighest)
@@ -98,15 +98,15 @@ func TestDeleteBidHighestCanNotFallback(t *testing.T) {
 
 func TestDeleteBidNotHighest(t *testing.T) {
 	mockedHighest := func(ctx context.Context, auctionId string,
-		onHighestBid func(topBid domain.Bid, secondBid domain.Bid) error,
+		onHighestBid func(topBids []domain.Bid) error,
 	) error {
-		return onHighestBid(domain.Bid{
-			Amount: 8,
-			UserId: 9,
-		}, domain.Bid{
-			Amount: 7,
-			UserId: 12,
-		})
+		return onHighestBid([]domain.Bid{
+			{Amount: 8,
+				UserId: 9,
+			}, {
+				Amount: 7,
+				UserId: 12,
+			}})
 	}
 
 	handler := createHandler(mockedHighest)

@@ -112,43 +112,44 @@ func publish() {
 		redisConn.Publish(ctx, "User", meBytes)
 	*/
 	/*
-			userME := domain.DeleteUserRequest{
-				Name: "Gyorgy2",
-				Id:   6,
+		userME := domain.DeleteUserRequest{
+			Name: "Gyorgy2",
+			Id:   6,
+		}
+
+		userMECreateBytes, _ := json.Marshal(userME)
+
+		eventMECreate := Event{
+			Event:   domain.UserDeleteRequested,
+			Payload: userMECreateBytes,
+		}
+
+		meBytes, _ := json.Marshal(eventMECreate)
+
+		redisConn.Publish(ctx, "User", meBytes)
+		/*
+			winner := domain.WinnerAnnounced{
+				WinnerId:  2,
+				AuctionId: "104b573c-cc10-418c-b9e8-64291ea720be",
 			}
 
-			userMECreateBytes, _ := json.Marshal(userME)
+			winnerBytes, _ := json.Marshal(winner)
 
-			eventMECreate := Event{
-				Event:   domain.UserDeleteRequested,
-				Payload: userMECreateBytes,
+			eventWinner := Event{
+				Event:   domain.AuctionWinnerAnnounced,
+				Payload: winnerBytes,
 			}
 
-			meBytes, _ := json.Marshal(eventMECreate)
+			winnerMessageBytes, _ := json.Marshal(eventWinner)
 
-			redisConn.Publish(ctx, "User", meBytes)
-			/*
-				winner := domain.WinnerAnnounced{
-					WinnerId:  2,
-					AuctionId: "104b573c-cc10-418c-b9e8-64291ea720be",
-				}
-
-				winnerBytes, _ := json.Marshal(winner)
-
-				eventWinner := Event{
-					Event:   domain.AuctionWinnerAnnounced,
-					Payload: winnerBytes,
-				}
-
-				winnerMessageBytes, _ := json.Marshal(eventWinner)
-
-				redisConn.Publish(ctx, "Auction", winnerMessageBytes)
-
+			redisConn.Publish(ctx, "Auction", winnerMessageBytes)
+	*/
+	/*
 		bidPLaced := domain.BidPlaced{
 			Promoted:  false,
-			Amount:    390,
-			UserId:    1,
-			AuctionId: "104b573c-cc10-418c-b9e8-64291ea720be",
+			Amount:    1,
+			UserId:    2,
+			AuctionId: "cff3e43f-d251-49fc-a779-b57f1d87a8fe",
 		}
 
 		bidPLacedbytes, _ := json.Marshal(bidPLaced)
@@ -162,11 +163,10 @@ func publish() {
 
 		redisConn.Publish(ctx, "Bid", bidPLacedEvetnBytes)
 	*/
-
 	bidDeleted := domain.BidDeleted{
-		BidId:     1,
-		Amount:    20,
-		UserId:    2,
+		BidId:     28,
+		Amount:    12,
+		UserId:    1,
 		AuctionId: "104b573c-cc10-418c-b9e8-64291ea720be",
 	}
 
@@ -180,4 +180,5 @@ func publish() {
 	bidDeletedEvetnBytes, _ := json.Marshal(bidDeletedEcent)
 
 	redisConn.Publish(ctx, "Bid", bidDeletedEvetnBytes)
+
 }
