@@ -3,7 +3,6 @@ package command
 import (
 	"errors"
 	"fmt"
-	"github.com/google/uuid"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/domain"
 	"time"
 )
@@ -31,7 +30,6 @@ func (c CreateAuctionHandler) Handle(auction domain.CreateAuctionRequested) erro
 		return errors.New(fmt.Sprintf("invalid dates. StartDate: %v, DueDate: %v", auction.StartDate, auction.DueDate))
 	}
 
-	auction.UUID = uuid.New().String()
 	newAuction := domain.NewAuction(auction)
 
 	return c.Repo.CreateNewAuction(newAuction)

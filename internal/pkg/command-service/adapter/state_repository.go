@@ -17,7 +17,7 @@ func (m MariaDbStateRepository) UpdateState(
 
 	var currentState domain.Auction
 
-	m.Db.First(&currentState, "UUID = ?", event.GetAuctionId())
+	m.Db.First(&currentState, "Id = ?", event.GetAuctionId())
 
 	newState, err := update(currentState)
 

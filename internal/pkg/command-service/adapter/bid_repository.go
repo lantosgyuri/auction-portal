@@ -3,6 +3,7 @@ package adapter
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/domain"
 	"gorm.io/gorm"
 )
@@ -12,6 +13,7 @@ type MariaDbBidRepository struct {
 }
 
 func (m MariaDbBidRepository) SaveBidEvent(event domain.BidEventRaw) error {
+	fmt.Printf("From repo %v \n", event)
 	return m.Db.Create(&event).Error
 }
 
@@ -35,11 +37,13 @@ func (m MariaDbBidRepository) IsHighestUserBid(ctx context.Context, placed domai
 	return validate(bid)
 }
 
+// TODO Test delete bid with Real data
 func (m MariaDbBidRepository) IsHighestAuctionBid(ctx context.Context, auctionId string,
 	onHighestBid func(topBid domain.Bid, secondBid domain.Bid) error) error {
 	bids := make([]domain.Bid, 2)
 
 	m.Db.Where("AuctionId = ?", auctionId).Limit(2).First(&bids)
 
+	fmt.Printf("Is highest %v \n", bids)
 	return onHighestBid(bids[0], bids[1])
 }

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/domain"
+	"time"
 )
 
 type PlaceBidHandler struct {
@@ -14,7 +15,6 @@ type PlaceBidHandler struct {
 
 func (p PlaceBidHandler) Handle(ctx context.Context, bid domain.BidPlaced) error {
 
-	// TODO check for: bid valid in time -> Auction Repo
 	highestBid := p.BidRepo.IsHighestUserBid(ctx, bid, func(highestBid domain.Bid) bool {
 		return bid.Amount > highestBid.Amount
 	})
@@ -30,6 +30,7 @@ func (p PlaceBidHandler) Handle(ctx context.Context, bid domain.BidPlaced) error
 		AuctionId: bid.AuctionId,
 	}
 
+	// TODO: ALSO SAVE BID EVENT WHEN BID IS SMALLER -> Add new field to the event
 	if err := p.BidRepo.SaveBid(b); err != nil {
 		return errors.New(fmt.Sprintf("can not save bid: %v", err))
 	}
@@ -38,6 +39,10 @@ func (p PlaceBidHandler) Handle(ctx context.Context, bid domain.BidPlaced) error
 
 		if auction.CurrentBid >= bid.Amount {
 			return domain.Auction{}, errors.New("ignore bid. Bid is smaller or equal with current bid")
+		}
+
+		if auction.DueDate <= int(time.Now().Unix()) {
+			return domain.Auction{}, errors.New("auction due date is in the past")
 		}
 
 		return domain.ApplyOnSnapshot(auction, bid), nil

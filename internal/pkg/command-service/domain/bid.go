@@ -10,10 +10,10 @@ type Bid struct {
 	gorm.Model
 	Id        int `gorm:"primaryKey"`
 	UserId    int
-	AuctionId string
+	AuctionId string `gorm:"size:191"`
 	Promoted  bool
 	Amount    int
-	Auction   Auction `gorm:"references:UUID"`
+	Auction   Auction
 	User      User
 }
 
