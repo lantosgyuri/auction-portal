@@ -6,15 +6,12 @@ import (
 )
 
 var messageCreate = CreateAuctionRequested{
-	UUID:      "tttt-ttt",
 	Name:      "Test",
 	StartDate: 1,
 	DueDate:   2,
-	Timestamp: 3,
 }
 
 var snapshot = Auction{
-	UUID:        "ttt-ttt",
 	Name:        "Test",
 	StartDate:   1,
 	DueDate:     2,
@@ -24,7 +21,6 @@ var snapshot = Auction{
 
 func TestNewAuction(t *testing.T) {
 	auction := NewAuction(messageCreate)
-	assert.EqualValues(t, "tttt-ttt", auction.UUID)
 	assert.EqualValues(t, messageCreate.Name, auction.Name)
 	assert.EqualValues(t, messageCreate.DueDate, auction.DueDate)
 	assert.EqualValues(t, messageCreate.StartDate, auction.StartDate)
@@ -85,7 +81,6 @@ func TestDoubleBid(t *testing.T) {
 
 func TestBidDeleted(t *testing.T) {
 	ss := Auction{
-		UUID:            "ttt-ttt",
 		Name:            "Test",
 		StartDate:       1,
 		DueDate:         2,

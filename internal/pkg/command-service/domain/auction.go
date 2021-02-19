@@ -1,17 +1,23 @@
 package domain
 
+import (
+	"github.com/google/uuid"
+	"gorm.io/gorm"
+)
+
 type AuctionEvent interface {
 	GetAuctionId() string
 }
 
 type AuctionEventRaw struct {
+	gorm.Model
+	Id        int `gorm:"primaryKey"`
 	EventType string
 	Name      string
 	AuctionId string
 	DueDate   int
 	StartDate int
 	Winner    int
-	Timestamp int
 }
 
 type CreateAuctionRequested struct {
@@ -19,17 +25,15 @@ type CreateAuctionRequested struct {
 	Name      string
 	DueDate   int
 	StartDate int
-	Timestamp int
 }
 
 func (c CreateAuctionRequested) GetAuctionId() string {
-	return c.UUID
+	return ""
 }
 
 type WinnerAnnounced struct {
 	AuctionId string
 	WinnerId  int
-	Timestamp int
 }
 
 func (w WinnerAnnounced) GetAuctionId() string {
@@ -37,7 +41,8 @@ func (w WinnerAnnounced) GetAuctionId() string {
 }
 
 type Auction struct {
-	UUID             string
+	gorm.Model
+	Id               string
 	Name             string
 	DueDate          int
 	StartDate        int
@@ -47,6 +52,11 @@ type Auction struct {
 	Promoted         bool
 	PlaceEventCount  int
 	DeleteEventCount int
+}
+
+func (a *Auction) BeforeCreate(tx *gorm.DB) (err error) {
+	a.Id = uuid.New().String()
+	return nil
 }
 
 func NewAuctionFromEvents(events []AuctionEvent) Auction {
@@ -73,7 +83,6 @@ func NewAuction(message CreateAuctionRequested) Auction {
 func (a *Auction) Apply(event AuctionEvent) {
 	switch e := event.(type) {
 	case CreateAuctionRequested:
-		a.UUID = e.UUID
 		a.Name = e.Name
 		a.DueDate = e.DueDate
 		a.StartDate = e.StartDate

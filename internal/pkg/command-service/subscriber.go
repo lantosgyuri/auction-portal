@@ -4,48 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/adapter"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/app"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/app/command"
-	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/app/query"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/domain"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/event-reaction"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/connection"
 	"sync"
 )
-
-type InMemoryDb struct {
-}
-
-func (i InMemoryDb) SaveAuctionEvent(event domain.AuctionEventRaw) error {
-	fmt.Printf("saving auction event %v \n", event)
-	return nil
-}
-
-func (i InMemoryDb) CreateNewAuction(auction domain.Auction) error {
-	fmt.Printf("saving auction %v \n", auction)
-	return nil
-}
-
-func (i InMemoryDb) UpdateAuctionState(auction domain.Auction) error {
-	fmt.Printf("updating auction %v \n", auction)
-	return nil
-}
-
-func (i InMemoryDb) SaveBidEvent(event domain.BidEventRaw) error {
-	fmt.Printf("saving bid event %v \n", event)
-	return nil
-}
-
-func (I InMemoryDb) FindAuction(ctx context.Context, auctionID string) (domain.Auction, error) {
-	return domain.Auction{
-		UUID:        "t",
-		Name:        "Test",
-		StartDate:   1,
-		DueDate:     2,
-		CurrentBid:  0,
-		CurrentUser: 0,
-	}, nil
-}
 
 func StartSubscriber(url string, parentWg *sync.WaitGroup) {
 	wg := sync.WaitGroup{}
@@ -57,15 +23,19 @@ func StartSubscriber(url string, parentWg *sync.WaitGroup) {
 
 	application := app.Application{
 		Commands: app.Commands{
-			CreateAuction:    command.CreateAuctionHandler{Repo: InMemoryDb{}},
-			SaveAuctionEvent: command.SaveAuctionEventHandler{Repo: InMemoryDb{}},
-			UpdateState:      command.UpdateStateHandler{Repo: InMemoryDb{}},
-			SaveBidEvent:     command.SaveBidEventHandler{Repo: InMemoryDb{}},
-		},
-		Queries: app.Queries{
-			GetAuctionState: query.AuctionStateHandler{
-				Reader: InMemoryDb{},
-			},
+			CreateAuction:    command.CreateAuctionHandler{Repo: adapter.MariaDbAuctionRepository{Db: connection.SotDb}},
+			SaveAuctionEvent: command.SaveAuctionEventHandler{Repo: adapter.MariaDbAuctionRepository{Db: connection.SotDb}},
+			CreateUser:       command.CreateUserHandler{Repo: adapter.MariaDbUserRepository{Db: connection.SotDb}},
+			SaveUserEvent:    command.SaveUserEventHandler{Repo: adapter.MariaDbUserRepository{Db: connection.SotDb}},
+			DeleteUser:       command.DeleteUserHandler{Repo: adapter.MariaDbUserRepository{Db: connection.SotDb}},
+			AnnounceWinner:   command.AnnounceWinnerHandler{Repo: adapter.MariaDbStateRepository{Db: connection.SotDb}},
+			SaveBidEvent:     command.SaveBidEventHandler{Repo: adapter.MariaDbBidRepository{Db: connection.SotDb}},
+			PlaceBid: command.PlaceBidHandler{
+				BidRepo:   adapter.MariaDbBidRepository{Db: connection.SotDb},
+				StateRepo: adapter.MariaDbStateRepository{Db: connection.SotDb}},
+			DeleteBid: command.DeleteBidHandler{
+				BidRepo:   adapter.MariaDbBidRepository{Db: connection.SotDb},
+				StateRepo: adapter.MariaDbStateRepository{Db: connection.SotDb}},
 		},
 	}
 

@@ -1,24 +1,30 @@
 package domain
 
+import "gorm.io/gorm"
+
 type BidEvent interface {
 	GetUserId() int
 }
 
 type Bid struct {
-	Id        int
+	gorm.Model
+	Id        int `gorm:"primaryKey"`
 	UserId    int
-	AuctionId string
+	AuctionId string `gorm:"size:191"`
 	Promoted  bool
 	Amount    int
+	Auction   Auction
+	User      User
 }
 
 type BidEventRaw struct {
+	gorm.Model
+	Id        int `gorm:"primaryKey"`
 	AuctionId string
 	UserId    int
 	EventType string
 	BidId     int
 	Amount    int
-	TimeStamp int
 }
 
 type BidPlaced struct {
@@ -26,7 +32,6 @@ type BidPlaced struct {
 	Promoted  bool
 	UserId    int
 	Amount    int
-	TimeStamp int
 }
 
 type BidDeleted struct {
@@ -35,7 +40,6 @@ type BidDeleted struct {
 	BidId      int
 	UserId     int
 	Amount     int
-	TimeStamp  int
 }
 
 func (b BidPlaced) GetAuctionId() string {

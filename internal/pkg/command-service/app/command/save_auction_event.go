@@ -19,11 +19,9 @@ func (s SaveAuctionEventHandler) Handle(eventName string, event domain.AuctionEv
 		rawEvent.Name = e.Name
 		rawEvent.DueDate = e.DueDate
 		rawEvent.StartDate = e.StartDate
-		rawEvent.Timestamp = e.Timestamp
 		return s.Repo.SaveAuctionEvent(rawEvent)
 	case domain.WinnerAnnounced:
 		rawEvent.Winner = e.WinnerId
-		rawEvent.Timestamp = e.Timestamp
 		return s.Repo.SaveAuctionEvent(rawEvent)
 	default:
 		return errors.New(fmt.Sprintf("no event found for: %v", e))
