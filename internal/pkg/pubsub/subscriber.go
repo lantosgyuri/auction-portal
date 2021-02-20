@@ -10,27 +10,36 @@ import (
 	"github.com/lantosgyuri/auction-portal/internal/pkg/connection"
 )
 
-type Subscriber struct {
-	client *redis.Client
+type EventSubscriber struct {
+	client   *redis.Client
+	channels []string
 }
 
-func CreateSubscriber(url string) (*Subscriber, error) {
+func CreateSubscriber(url string) (*EventSubscriber, error) {
 	c, err := connection.SetUpRedis(url)
 
 	if err != nil {
 		return nil, errors.New(fmt.Sprintf("can not create redis connection: %v", err))
 	}
 
-	return &Subscriber{
+	return &EventSubscriber{
 		client: c,
 	}, nil
 }
 
-func (s *Subscriber) GetEvents(channel string, eventChan chan domain.Event) {
-	pubs := s.client.Subscribe(context.Background(), channel)
+func (s *EventSubscriber) AddChannel(ch string) {
+	s.channels = append(s.channels, ch)
+}
 
-	ch := pubs.Channel()
+func (s *EventSubscriber) Get(eventChan chan domain.Event) {
+	for _, v := range s.channels {
+		pubs := s.client.Subscribe(context.Background(), v)
+		ch := pubs.Channel()
+		go consumeEvents(ch, eventChan)
+	}
+}
 
+func consumeEvents(ch <-chan *redis.Message, eventChan chan domain.Event) {
 	for msg := range ch {
 		var event domain.Event
 		if err := json.Unmarshal([]byte(msg.Payload), &event); err != nil {
@@ -38,5 +47,4 @@ func (s *Subscriber) GetEvents(channel string, eventChan chan domain.Event) {
 		}
 		eventChan <- event
 	}
-
 }

@@ -16,10 +16,27 @@ func StartSubscriber(url string, parentWg *sync.WaitGroup) {
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 
-	auctionEventChan := make(chan domain.Event)
-	bidEventChan := make(chan domain.Event)
-	userEventChan := make(chan domain.Event)
+	eventChannel := make(chan domain.Event)
+	eventSubscriber, err := pubsub.CreateSubscriber(url)
 
+	if err != nil {
+		fmt.Printf("error happened during create subscriber: %v", err)
+		wg.Done()
+	}
+
+	eventSubscriber.AddChannel("Auction")
+	eventSubscriber.AddChannel("Bid")
+	eventSubscriber.AddChannel("User")
+
+	eventSubscriber.Get(eventChannel)
+
+	go consumeMessages(eventChannel)
+
+	wg.Wait()
+	parentWg.Done()
+}
+
+func consumeMessages(eventChan chan domain.Event) {
 	application := app.Application{
 		Commands: app.Commands{
 			CreateAuction:    command.CreateAuctionHandler{Repo: adapter.MariaDbAuctionRepository{Db: connection.SotDb}},
@@ -38,31 +55,6 @@ func StartSubscriber(url string, parentWg *sync.WaitGroup) {
 		},
 	}
 
-	go handleChannel(url, "Auction", &wg, application, auctionEventChan)
-	go handleChannel(url, "Bid", &wg, application, bidEventChan)
-	go handleChannel(url, "User", &wg, application, userEventChan)
-
-	wg.Wait()
-	parentWg.Done()
-}
-
-func handleChannel(url string, channelName string, wg *sync.WaitGroup, application app.Application, eventChan chan domain.Event) {
-	go subscribeToChan(url, channelName, wg, eventChan)
-	go consumeMessages(application, eventChan)
-}
-
-func subscribeToChan(url string, channelName string, wg *sync.WaitGroup, eventChan chan domain.Event) {
-	subscriber, err := pubsub.CreateSubscriber(url)
-
-	if err != nil {
-		fmt.Printf("error happened during create subscriber: %v", err)
-		wg.Done()
-	}
-
-	subscriber.GetEvents(channelName, eventChan)
-}
-
-func consumeMessages(application app.Application, eventChan chan domain.Event) {
 	for event := range eventChan {
 		reaction, found := event_reaction.Commands[event.Event]
 		if !found {
