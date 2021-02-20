@@ -1,8 +1,8 @@
 package main
 
 import (
-	command_service "github.com/lantosgyuri/auction-portal/internal/pkg/command-service"
-	"github.com/lantosgyuri/auction-portal/internal/pkg/command-service/adapter"
+	command_service "github.com/lantosgyuri/auction-portal/internal/command-service"
+	"github.com/lantosgyuri/auction-portal/internal/command-service/adapter"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/connection"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/input"
 	"gopkg.in/yaml.v3"
