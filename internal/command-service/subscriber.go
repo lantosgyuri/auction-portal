@@ -1,6 +1,7 @@
 package command_service
 
 import (
+	"encoding/json"
 	"fmt"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/adapter"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/app"
@@ -16,6 +17,7 @@ func StartSubscriber(url string, parentWg *sync.WaitGroup) {
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 
+	messageChannel := make(chan []byte)
 	eventChannel := make(chan domain.Event)
 	eventSubscriber, err := pubsub.CreateSubscriber(url)
 
@@ -28,12 +30,22 @@ func StartSubscriber(url string, parentWg *sync.WaitGroup) {
 	eventSubscriber.AddChannel("Bid")
 	eventSubscriber.AddChannel("User")
 
-	eventSubscriber.Get(eventChannel)
-
+	eventSubscriber.Get(messageChannel)
+	go convertMessage(messageChannel, eventChannel)
 	go consumeMessages(eventChannel)
 
 	wg.Wait()
 	parentWg.Done()
+}
+
+func convertMessage(messageChannel chan []byte, eventChannel chan domain.Event) {
+	for message := range messageChannel {
+		var event domain.Event
+		if err := json.Unmarshal(message, &event); err != nil {
+			fmt.Printf("error happened during unmarshal event: %v", err)
+		}
+		eventChannel <- event
+	}
 }
 
 func consumeMessages(eventChan chan domain.Event) {
