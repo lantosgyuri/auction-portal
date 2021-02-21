@@ -1,12 +1,20 @@
 package event_reaction
 
 import (
-	"github.com/lantosgyuri/auction-portal/internal/command-service/app"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
 )
 
-var Commands = make(map[string]Command)
-
 type Command interface {
-	Execute(application app.Application, event domain.Event) error
+	Execute(event domain.Event) error
+}
+
+func CreateCommands() map[string]Command {
+	commands := make(map[string]Command)
+	commands[domain.AuctionRequested] = CreateAuctionRequestedCommand()
+	commands[domain.BidDeleteRequested] = CreateBidDeletedCommand()
+	commands[domain.BidPlaceRequested] = CreateBidPlacedReqCommand()
+	commands[domain.UserCreateRequested] = MakeCreateUserCommand()
+	commands[domain.UserDeleteRequested] = CreateUserDeleteCommand()
+	commands[domain.AuctionWinnerAnnounced] = CreateWinnerAnnouncedCommand()
+	return commands
 }

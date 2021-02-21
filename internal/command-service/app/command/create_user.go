@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"errors"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
 )
@@ -9,7 +10,7 @@ type CreateUserHandler struct {
 	Repo UserRepository
 }
 
-func (c CreateUserHandler) Handle(userRequest domain.CreateUserRequested) error {
+func (c CreateUserHandler) Handle(context context.Context, userRequest domain.CreateUserRequested) error {
 
 	if userRequest.Name == "" {
 		return errors.New("no name provided for user")
