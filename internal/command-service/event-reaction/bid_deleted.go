@@ -5,27 +5,51 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/lantosgyuri/auction-portal/internal/command-service/app"
+	"github.com/lantosgyuri/auction-portal/internal/command-service/adapter"
+	"github.com/lantosgyuri/auction-portal/internal/command-service/app/command"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
+	"github.com/lantosgyuri/auction-portal/internal/pkg/connection"
 )
 
-func init() {
-	Commands[domain.BidDeleteRequested] = BidDeleteRequestedCommand{}
+type BidDeletedEventHandler interface {
+	Handle(ctx context.Context, event domain.BidDeleted) error
 }
 
-type BidDeleteRequestedCommand struct{}
+type BidDeleteRequestedCommand struct {
+	handler   BidDeletedEventHandler
+	preserver PreserveBidEvent
+}
 
-func (b BidDeleteRequestedCommand) Execute(application app.Application, event domain.Event) error {
+func CreateBidDeletedCommand() BidDeleteRequestedCommand {
+	handler := command.DeleteBidHandler{
+		BidRepo:   adapter.MariaDbBidRepository{Db: connection.SotDb},
+		StateRepo: adapter.MariaDbStateRepository{Db: connection.SotDb},
+	}
+	preserver := command.SaveBidEventHandler{
+		Repo: adapter.MariaDbBidRepository{Db: connection.SotDb},
+	}
+
+	return CreateBidDeletedWithInterfaces(handler, preserver)
+}
+
+func CreateBidDeletedWithInterfaces(handler BidDeletedEventHandler, preserver PreserveBidEvent) BidDeleteRequestedCommand {
+	return BidDeleteRequestedCommand{
+		handler:   handler,
+		preserver: preserver,
+	}
+}
+
+func (b BidDeleteRequestedCommand) Execute(event domain.Event) error {
 	var bidDeleteMessage domain.BidDeleted
 
 	if err := json.Unmarshal(event.Payload, &bidDeleteMessage); err != nil {
 		return errors.New(fmt.Sprintf("Error happened with unmarshalling winner message: %v", err))
 	}
 
-	if err := application.Commands.DeleteBid.Handle(context.Background(), bidDeleteMessage); err != nil {
+	if err := b.handler.Handle(context.Background(), bidDeleteMessage); err != nil {
 		return err
 	}
-	if err := application.Commands.SaveBidEvent.Handle(event.Event, bidDeleteMessage); err != nil {
+	if err := b.preserver.Handle(event.Event, bidDeleteMessage); err != nil {
 		return err
 	}
 

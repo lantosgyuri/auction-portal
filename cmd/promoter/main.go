@@ -42,18 +42,20 @@ func publish() {
 
 	/*
 		auction := CreateAuction{
-			DueDate:   int(time.Now().AddDate(0, 0, 2).Unix()),
-			StartDate: int(time.Now().AddDate(0, 0, 4).Unix()),
+			DueDate:   int(time.Now().AddDate(0, 0, 8).Unix()),
+			StartDate: int(time.Now().AddDate(0, 0, 1).Unix()),
 			Timestamp: int(time.Now().Unix()),
-			Name:      "Test2",
+			Name:      "Test3",
 		}
 	*/
 	/*
 		user := domain.CreateUserRequested{
-			Name:     "Johanna2",
+			Name:     "Mia",
 			Password: "Secret",
 		}
 
+	*/
+	/*
 		userIvan := domain.CreateUserRequested{
 			Name:     "Ivan2",
 			Password: "Top Secret",
@@ -65,34 +67,35 @@ func publish() {
 		}
 	*/
 	/*
-		userME := domain.DeleteUserRequest{
-			Name: "Gyorgy2",
-			Id:   6,
-		}
-		/*
+				userME := domain.DeleteUserRequest{
+					Name: "Mia",
+					Id:   7,
+				}
+
+
 			winner := domain.WinnerAnnounced{
 				WinnerId:  2,
-				AuctionId: "104b573c-cc10-418c-b9e8-64291ea720be",
+				AuctionId: "0bd37b85-f5d1-4418-a796-7eaf29980005",
 			}
-	*/
-	/*
+
+
 		bidPLaced := domain.BidPlaced{
 			Promoted:  false,
-			Amount:    150,
-			UserId:    1,
-			AuctionId: "cff3e43f-d251-49fc-a779-b57f1d87a8fe",
+			Amount:    250,
+			UserId:    3,
+			AuctionId: "0bd37b85-f5d1-4418-a796-7eaf29980005",
 		}
-
 	*/
 
 	bidDeleted := domain.BidDeleted{
-		BidId:     30,
-		Amount:    100,
-		UserId:    2,
-		AuctionId: "cff3e43f-d251-49fc-a779-b57f1d87a8fe",
+		BidId:     38,
+		Amount:    250,
+		UserId:    3,
+		AuctionId: "0bd37b85-f5d1-4418-a796-7eaf29980005",
 	}
 
 	send(bidDeleted, domain.BidDeleteRequested, "Bid", p)
+
 }
 
 func send(message interface{}, eventName, channel string, p *pubsub.Publisher) {

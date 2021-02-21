@@ -1,31 +1,57 @@
 package event_reaction
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/lantosgyuri/auction-portal/internal/command-service/app"
+	"github.com/lantosgyuri/auction-portal/internal/command-service/adapter"
+	"github.com/lantosgyuri/auction-portal/internal/command-service/app/command"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
+	"github.com/lantosgyuri/auction-portal/internal/pkg/connection"
 )
 
-func init() {
-	Commands[domain.UserDeleteRequested] = UserDeleteCommand{}
+type UserDeleteEventHandler interface {
+	Handle(ctx context.Context, event domain.DeleteUserRequest) error
 }
 
-type UserDeleteCommand struct{}
+type UserDeleteCommand struct {
+	handler   UserDeleteEventHandler
+	preserver PreserveUserEvent
+}
 
-func (u UserDeleteCommand) Execute(application app.Application, event domain.Event) error {
+func CreateUserDeleteCommand() UserDeleteCommand {
+	handler := command.DeleteUserHandler{
+		Repo: adapter.MariaDbUserRepository{
+			Db: connection.SotDb,
+		},
+	}
+	preserver := command.SaveUserEventHandler{
+		Repo: adapter.MariaDbUserRepository{Db: connection.SotDb},
+	}
+
+	return CreateUserDeleteWithInterfaces(handler, preserver)
+}
+
+func CreateUserDeleteWithInterfaces(handler UserDeleteEventHandler, preserver PreserveUserEvent) UserDeleteCommand {
+	return UserDeleteCommand{
+		handler:   handler,
+		preserver: preserver,
+	}
+}
+
+func (u UserDeleteCommand) Execute(event domain.Event) error {
 	var userDeleteRequested domain.DeleteUserRequest
 	if err := json.Unmarshal(event.Payload, &userDeleteRequested); err != nil {
 		return errors.New(fmt.Sprintf("Error happened with unmarshalling delete user request: %v", err))
 	}
 
-	err := application.Commands.DeleteUser.Handle(userDeleteRequested)
+	err := u.handler.Handle(context.Background(), userDeleteRequested)
 	if err != nil {
 		return errors.New(fmt.Sprintf("Error happened with deleting user: %v", err))
 	}
 
-	err = application.Commands.SaveUserEvent.Handle(event.Event, userDeleteRequested)
+	err = u.preserver.Handle(event.Event, userDeleteRequested)
 	if err != nil {
 		return errors.New(fmt.Sprintf("Error happened during saving the user event: %v", err))
 	}
