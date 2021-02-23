@@ -21,17 +21,15 @@ func (d DeleteBidHandler) Handle(ctx context.Context, deletedBid domain.BidDelet
 				return errors.New(fmt.Sprintf("no bids for auction %v", deletedBid.AuctionId))
 			}
 
-			if isHighestBidFromUser(topBids[0], deletedBid) {
+			if isHighestBid(topBids[0], deletedBid) {
 				deletedBid.ShouldSwap = true
 				deletedBid.UserId = 0
 				deletedBid.Amount = 0
-				fmt.Printf(" from user %v, %v, %v", deletedBid.Amount, deletedBid.UserId, deletedBid.ShouldSwap)
 				if canFallbackToBid(topBids) {
 					deletedBid.UserId = topBids[1].UserId
 					deletedBid.Amount = topBids[1].Amount
 				}
 			}
-			fmt.Printf(" %v, %v, %v", deletedBid.Amount, deletedBid.UserId, deletedBid.ShouldSwap)
 			if updateErr := d.StateRepo.UpdateState(ctx, deletedBid, func(auction domain.Auction) (domain.Auction, error) {
 				return domain.ApplyOnSnapshot(auction, deletedBid), nil
 			}); updateErr != nil {
@@ -52,8 +50,8 @@ func (d DeleteBidHandler) Handle(ctx context.Context, deletedBid domain.BidDelet
 	return d.BidRepo.DeleteBid(bid)
 }
 
-func isHighestBidFromUser(topBid domain.Bid, deletedBid domain.BidDeleted) bool {
-	return topBid.UserId == deletedBid.UserId
+func isHighestBid(topBid domain.Bid, deletedBid domain.BidDeleted) bool {
+	return topBid.Id == deletedBid.BidId
 }
 
 func canFallbackToBid(bids []domain.Bid) bool {

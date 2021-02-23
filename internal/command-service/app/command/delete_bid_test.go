@@ -113,7 +113,7 @@ func TestDeleteBidNotHighest(t *testing.T) {
 
 	err := handler.Handle(context.Background(), message)
 
-	assertResults(t, err, mStateRepo.state, 0, 0, 3)
+	assertResults(t, err, mStateRepo.state, 12, 7, 3)
 }
 
 func createHandler(callback isHighestAuctionBid) command.DeleteBidHandler {

@@ -67,32 +67,36 @@ func publish() {
 		}
 	*/
 	/*
-				userME := domain.DeleteUserRequest{
-					Name: "Mia",
-					Id:   7,
-				}
-
-
-			winner := domain.WinnerAnnounced{
-				WinnerId:  2,
-				AuctionId: "0bd37b85-f5d1-4418-a796-7eaf29980005",
+			userME := domain.DeleteUserRequest{
+				Name: "Mia",
+				Id:   7,
 			}
 
 
-		bidPLaced := domain.BidPlaced{
-			Promoted:  false,
-			Amount:    250,
-			UserId:    3,
+		winner := domain.WinnerAnnounced{
+			WinnerId:  2,
 			AuctionId: "0bd37b85-f5d1-4418-a796-7eaf29980005",
 		}
-	*/
 
-	bidDeleted := domain.BidDeleted{
-		BidId:     38,
-		Amount:    250,
+	*/
+	bidPLaced := domain.BidPlaced{
+		Promoted:  false,
+		Amount:    400,
 		UserId:    3,
 		AuctionId: "0bd37b85-f5d1-4418-a796-7eaf29980005",
 	}
+
+	fmt.Println(bidPLaced)
+	//send(bidPLaced, domain.BidPlaceRequested, "Bid", p)
+
+	bidDeleted := domain.BidDeleted{
+		BidId:     35,
+		Amount:    150,
+		UserId:    1,
+		AuctionId: "0bd37b85-f5d1-4418-a796-7eaf29980005",
+	}
+
+	fmt.Print(bidDeleted)
 
 	send(bidDeleted, domain.BidDeleteRequested, "Bid", p)
 
