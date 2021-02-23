@@ -22,6 +22,7 @@ type PreserveUserEvent interface {
 type CreateUserCommand struct {
 	handler   CreateUserEventHandler
 	preserver PreserveUserEvent
+	publisher EventPublisher
 }
 
 func MakeCreateUserCommand() CreateUserCommand {
@@ -60,6 +61,9 @@ func (c CreateUserCommand) Execute(event domain.Event) error {
 	if err != nil {
 		return errors.New(fmt.Sprintf("Error happened during saving the user event: %v", err))
 	}
-
+	err = c.publisher.Publish(event)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Can not publish event: %v", err))
+	}
 	return nil
 }

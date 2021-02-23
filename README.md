@@ -60,6 +60,7 @@ I think this is the good solution as the source of the truth part should be as c
 (_article_ [7])
 
 ### Things to be implemented after the MVP:
+- Logging
 - Auth
 - Cache
 - Pessimistic lock

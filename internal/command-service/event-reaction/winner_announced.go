@@ -18,6 +18,7 @@ type WinnerAnnouncedEventHandler interface {
 type WinnerAnnouncedCommand struct {
 	handler   WinnerAnnouncedEventHandler
 	preserver AuctionEventPreserver
+	publisher EventPublisher
 }
 
 func CreateWinnerAnnouncedCommand() WinnerAnnouncedCommand {
@@ -45,6 +46,10 @@ func (w WinnerAnnouncedCommand) Execute(event domain.Event) error {
 
 	if err := w.preserver.Handle(event.Event, winnerMessage); err != nil {
 		return errors.New(fmt.Sprintf("Error happened during saving the auction event: %v", err))
+	}
+
+	if err := w.publisher.Publish(event); err != nil {
+		return errors.New(fmt.Sprintf("Can not publish event: %v", err))
 	}
 	return nil
 }

@@ -18,6 +18,7 @@ type UserDeleteEventHandler interface {
 type UserDeleteCommand struct {
 	handler   UserDeleteEventHandler
 	preserver PreserveUserEvent
+	publisher EventPublisher
 }
 
 func CreateUserDeleteCommand() UserDeleteCommand {
@@ -54,6 +55,10 @@ func (u UserDeleteCommand) Execute(event domain.Event) error {
 	err = u.preserver.Handle(event.Event, userDeleteRequested)
 	if err != nil {
 		return errors.New(fmt.Sprintf("Error happened during saving the user event: %v", err))
+	}
+	err = u.publisher.Publish(event)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Can not publish event: %v", err))
 	}
 	return nil
 }

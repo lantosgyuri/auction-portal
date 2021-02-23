@@ -18,6 +18,7 @@ type BidDeletedEventHandler interface {
 type BidDeleteRequestedCommand struct {
 	handler   BidDeletedEventHandler
 	preserver PreserveBidEvent
+	publisher EventPublisher
 }
 
 func CreateBidDeletedCommand() BidDeleteRequestedCommand {
@@ -52,6 +53,8 @@ func (b BidDeleteRequestedCommand) Execute(event domain.Event) error {
 	if err := b.preserver.Handle(event.Event, bidDeleteMessage); err != nil {
 		return err
 	}
-
+	if err := b.publisher.Publish(event); err != nil {
+		return errors.New(fmt.Sprintf("Can not publish event: %v", err))
+	}
 	return nil
 }

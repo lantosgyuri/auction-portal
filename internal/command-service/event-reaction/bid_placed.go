@@ -22,6 +22,7 @@ type PreserveBidEvent interface {
 type BidPlaceRequestedCommand struct {
 	handler   BidPLacedEventHandler
 	preserver PreserveBidEvent
+	publisher EventPublisher
 }
 
 func CreateBidPlacedReqCommand() BidPlaceRequestedCommand {
@@ -57,6 +58,9 @@ func (b BidPlaceRequestedCommand) Execute(event domain.Event) error {
 	}
 	if err := b.preserver.Handle(event.Event, bidPlacedMessage); err != nil {
 		return err
+	}
+	if err := b.publisher.Publish(event); err != nil {
+		return errors.New(fmt.Sprintf("Can not publish event: %v", err))
 	}
 
 	return nil

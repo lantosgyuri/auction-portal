@@ -20,6 +20,7 @@ type AuctionEventPreserver interface {
 type AuctionRequestedCommand struct {
 	handler   AuctionCreateEventHandler
 	preserver AuctionEventPreserver
+	publisher EventPublisher
 }
 
 func CreateAuctionRequestedCommand() AuctionRequestedCommand {
@@ -44,11 +45,13 @@ func (a AuctionRequestedCommand) Execute(event domain.Event) error {
 	if err != nil {
 		return errors.New(fmt.Sprintf("Error happened with creating auction: %v", err))
 	}
-	fmt.Println("HIST")
 	err = a.preserver.Handle(event.Event, auction)
 	if err != nil {
 		return errors.New(fmt.Sprintf("Error happened during saving the auction event: %v", err))
 	}
-
+	err = a.publisher.Publish(event)
+	if err != nil {
+		return errors.New(fmt.Sprintf("Can not publish event: %v", err))
+	}
 	return nil
 }
