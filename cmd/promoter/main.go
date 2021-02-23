@@ -81,7 +81,7 @@ func publish() {
 	*/
 	bidPLaced := domain.BidPlaced{
 		Promoted:  false,
-		Amount:    400,
+		Amount:    480,
 		UserId:    3,
 		AuctionId: "0bd37b85-f5d1-4418-a796-7eaf29980005",
 	}
@@ -90,9 +90,9 @@ func publish() {
 	//send(bidPLaced, domain.BidPlaceRequested, "Bid", p)
 
 	bidDeleted := domain.BidDeleted{
-		BidId:     35,
-		Amount:    150,
-		UserId:    1,
+		BidId:     49,
+		Amount:    480,
+		UserId:    3,
 		AuctionId: "0bd37b85-f5d1-4418-a796-7eaf29980005",
 	}
 
