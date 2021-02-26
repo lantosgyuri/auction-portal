@@ -3,6 +3,7 @@ package main
 import (
 	command_service "github.com/lantosgyuri/auction-portal/internal/command-service"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/adapter"
+	"github.com/lantosgyuri/auction-portal/internal/pkg/config"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/connection"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/input"
 	"gopkg.in/yaml.v3"
@@ -10,23 +11,10 @@ import (
 	"sync"
 )
 
-type Config struct {
-	RedisConf redisConf `yaml:"redis"`
-	SotDbConf sotDbConf `yaml:"sotDb"`
-}
-
-type redisConf struct {
-	Url string `yaml:"url"`
-}
-
-type sotDbConf struct {
-	Dsn string `yaml:"dsn"`
-}
-
 func main() {
 	wg := sync.WaitGroup{}
 	wg.Add(1)
-	var conf Config
+	var conf config.CommandService
 
 	confBytes, err := input.ReadFile("config.yaml")
 
@@ -44,6 +32,6 @@ func main() {
 	defer connection.CloseMariaDb()
 	adapter.MigrateSotDb(&wg)
 
-	command_service.StartSubscriber(conf.RedisConf.Url, &wg)
+	command_service.StartSubscriber(conf, &wg)
 	wg.Wait()
 }

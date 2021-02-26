@@ -8,6 +8,7 @@ import (
 	"github.com/lantosgyuri/auction-portal/internal/command-service/adapter"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/app/command"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
+	"github.com/lantosgyuri/auction-portal/internal/pkg/config"
 )
 
 type BidPLacedEventHandler interface {
@@ -23,7 +24,7 @@ type BidPlaceRequestedCommand struct {
 	preserver PreserveBidEvent
 }
 
-func CreateBidPlacedReqCommand() BidPlaceRequestedCommand {
+func CreateBidPlacedReqCommand(conf config.CommandService) BidPlaceRequestedCommand {
 	handler := command.PlaceBidHandler{
 		StateRepo: adapter.CreateMariaDbStateRepository(),
 		BidRepo:   adapter.CreateMariaDbBidRepository(),

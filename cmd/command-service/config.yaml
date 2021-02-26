@@ -1,5 +1,6 @@
 redis:
-  url: redis://localhost:6364
+  writeUrl: redis://localhost:6364
+  queryUrl: redis://localhost:6365
 
 sotDb:
   dsn: root:root@tcp(127.0.0.1:3306)/sot?parseTime=true

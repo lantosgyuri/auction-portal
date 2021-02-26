@@ -7,6 +7,7 @@ import (
 	"github.com/lantosgyuri/auction-portal/internal/command-service/adapter"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/app/command"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
+	"github.com/lantosgyuri/auction-portal/internal/pkg/config"
 )
 
 type AuctionCreateEventHandler interface {
@@ -21,7 +22,7 @@ type AuctionRequestedCommand struct {
 	preserver AuctionEventPreserver
 }
 
-func CreateAuctionRequestedCommand() AuctionRequestedCommand {
+func CreateAuctionRequestedCommand(conf config.CommandService) AuctionRequestedCommand {
 	handler := command.CreateAuctionHandler{
 		Repo: adapter.CreateMariaDbAuctionRepository(),
 	}

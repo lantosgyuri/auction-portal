@@ -7,6 +7,12 @@ services:
       - "6364:6379"
     restart: always
     container_name: 'writeQueue'
+  queryQueue:
+    image: "redis:alpine"
+    ports:
+      - "6365:6379"
+    restart: always
+    container_name: 'queryQueue'
   eventDb:
       image: mariadb
       restart: always

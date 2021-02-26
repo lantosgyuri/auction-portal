@@ -8,6 +8,7 @@ import (
 	"github.com/lantosgyuri/auction-portal/internal/command-service/adapter"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/app/command"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
+	"github.com/lantosgyuri/auction-portal/internal/pkg/config"
 )
 
 type UserDeleteEventHandler interface {
@@ -20,7 +21,7 @@ type UserDeleteCommand struct {
 	publisher EventPublisher
 }
 
-func CreateUserDeleteCommand() UserDeleteCommand {
+func CreateUserDeleteCommand(conf config.CommandService) UserDeleteCommand {
 	handler := command.DeleteUserHandler{
 		Repo: adapter.CreateMariaDbUserRepository(),
 	}

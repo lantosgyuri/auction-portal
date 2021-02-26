@@ -8,6 +8,7 @@ import (
 	"github.com/lantosgyuri/auction-portal/internal/command-service/adapter"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/app/command"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
+	"github.com/lantosgyuri/auction-portal/internal/pkg/config"
 )
 
 type CreateUserEventHandler interface {
@@ -24,7 +25,7 @@ type CreateUserCommand struct {
 	publisher EventPublisher
 }
 
-func MakeCreateUserCommand() CreateUserCommand {
+func MakeCreateUserCommand(conf config.CommandService) CreateUserCommand {
 	handler := command.CreateUserHandler{
 		Repo: adapter.CreateMariaDbUserRepository(),
 	}

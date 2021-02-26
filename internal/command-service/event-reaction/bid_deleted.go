@@ -8,6 +8,7 @@ import (
 	"github.com/lantosgyuri/auction-portal/internal/command-service/adapter"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/app/command"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
+	"github.com/lantosgyuri/auction-portal/internal/pkg/config"
 )
 
 type BidDeletedEventHandler interface {
@@ -20,7 +21,7 @@ type BidDeleteRequestedCommand struct {
 	publisher EventPublisher
 }
 
-func CreateBidDeletedCommand() BidDeleteRequestedCommand {
+func CreateBidDeletedCommand(conf config.CommandService) BidDeleteRequestedCommand {
 	handler := command.DeleteBidHandler{
 		BidRepo:   adapter.CreateMariaDbBidRepository(),
 		StateRepo: adapter.CreateMariaDbStateRepository(),
