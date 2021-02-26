@@ -41,7 +41,7 @@ func main() {
 	}
 
 	connection.InitializeMariaDb(conf.SotDbConf.Dsn)
-	defer connection.CloseMariDb()
+	defer connection.CloseMariaDb()
 	adapter.MigrateSotDb(&wg)
 
 	command_service.StartSubscriber(conf.RedisConf.Url, &wg)

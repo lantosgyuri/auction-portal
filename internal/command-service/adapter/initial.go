@@ -9,12 +9,9 @@ import (
 
 func MigrateSotDb(wg *sync.WaitGroup) {
 
-	if connection.SotDb == nil {
-		fmt.Print("No DB is set up")
-		wg.Done()
-	}
+	db := connection.GetMariDbConnection()
 
-	if err := connection.SotDb.AutoMigrate(
+	if err := db.AutoMigrate(
 		&domain.AuctionEventRaw{},
 		&domain.BidEventRaw{},
 		&domain.UserEventRaw{},

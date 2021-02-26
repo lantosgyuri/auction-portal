@@ -8,7 +8,6 @@ import (
 	"github.com/lantosgyuri/auction-portal/internal/command-service/adapter"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/app/command"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
-	"github.com/lantosgyuri/auction-portal/internal/pkg/connection"
 )
 
 type BidDeletedEventHandler interface {
@@ -23,11 +22,11 @@ type BidDeleteRequestedCommand struct {
 
 func CreateBidDeletedCommand() BidDeleteRequestedCommand {
 	handler := command.DeleteBidHandler{
-		BidRepo:   adapter.MariaDbBidRepository{Db: connection.SotDb},
-		StateRepo: adapter.MariaDbStateRepository{Db: connection.SotDb},
+		BidRepo:   adapter.CreateMariaDbBidRepository(),
+		StateRepo: adapter.CreateMariaDbStateRepository(),
 	}
 	preserver := command.SaveBidEventHandler{
-		Repo: adapter.MariaDbBidRepository{Db: connection.SotDb},
+		Repo: adapter.CreateMariaDbBidRepository(),
 	}
 
 	return CreateBidDeletedWithInterfaces(handler, preserver)

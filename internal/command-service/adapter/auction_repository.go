@@ -2,17 +2,24 @@ package adapter
 
 import (
 	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
+	"github.com/lantosgyuri/auction-portal/internal/pkg/connection"
 	"gorm.io/gorm"
 )
 
 type MariaDbAuctionRepository struct {
-	Db *gorm.DB
+	db *gorm.DB
+}
+
+func CreateMariaDbAuctionRepository() MariaDbAuctionRepository {
+	return MariaDbAuctionRepository{
+		db: connection.GetMariDbConnection(),
+	}
 }
 
 func (m MariaDbAuctionRepository) SaveAuctionEvent(event domain.AuctionEventRaw) error {
-	return m.Db.Create(&event).Error
+	return m.db.Create(&event).Error
 }
 
 func (m MariaDbAuctionRepository) CreateNewAuction(auction domain.Auction) error {
-	return m.Db.Create(&auction).Error
+	return m.db.Create(&auction).Error
 }

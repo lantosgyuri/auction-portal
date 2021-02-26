@@ -8,7 +8,6 @@ import (
 	"github.com/lantosgyuri/auction-portal/internal/command-service/adapter"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/app/command"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
-	"github.com/lantosgyuri/auction-portal/internal/pkg/connection"
 )
 
 type WinnerAnnouncedEventHandler interface {
@@ -22,8 +21,8 @@ type WinnerAnnouncedCommand struct {
 }
 
 func CreateWinnerAnnouncedCommand() WinnerAnnouncedCommand {
-	handler := command.AnnounceWinnerHandler{Repo: adapter.MariaDbStateRepository{Db: connection.SotDb}}
-	preserver := command.SaveAuctionEventHandler{Repo: adapter.MariaDbAuctionRepository{Db: connection.SotDb}}
+	handler := command.AnnounceWinnerHandler{Repo: adapter.CreateMariaDbStateRepository()}
+	preserver := command.SaveAuctionEventHandler{Repo: adapter.CreateMariaDbAuctionRepository()}
 	return CreateWinnerCommandWithInterfaces(handler, preserver)
 }
 

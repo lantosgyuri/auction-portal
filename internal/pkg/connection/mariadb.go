@@ -6,22 +6,29 @@ import (
 	"log"
 )
 
-var SotDb *gorm.DB
+var sotDb *gorm.DB
 
 func InitializeMariaDb(dsn string) {
-	if SotDb == nil {
+	if sotDb == nil {
 		freshDb, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 
 		if err != nil {
 			log.Fatal("can not create MariaDb Connection")
 		}
-		SotDb = freshDb
+		sotDb = freshDb
 	}
 }
 
-func CloseMariDb() {
-	if SotDb != nil {
-		sqlDb, err := SotDb.DB()
+func GetMariDbConnection() *gorm.DB {
+	if sotDb == nil {
+		log.Fatal("there are no connection opened.")
+	}
+	return sotDb
+}
+
+func CloseMariaDb() {
+	if sotDb != nil {
+		sqlDb, err := sotDb.DB()
 		if err != nil {
 			log.Fatal("can not get generic sql object")
 		}

@@ -7,7 +7,6 @@ import (
 	"github.com/lantosgyuri/auction-portal/internal/command-service/adapter"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/app/command"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
-	"github.com/lantosgyuri/auction-portal/internal/pkg/connection"
 )
 
 type AuctionCreateEventHandler interface {
@@ -20,14 +19,13 @@ type AuctionEventPreserver interface {
 type AuctionRequestedCommand struct {
 	handler   AuctionCreateEventHandler
 	preserver AuctionEventPreserver
-	publisher EventPublisher
 }
 
 func CreateAuctionRequestedCommand() AuctionRequestedCommand {
 	handler := command.CreateAuctionHandler{
-		Repo: adapter.MariaDbAuctionRepository{Db: connection.SotDb},
+		Repo: adapter.CreateMariaDbAuctionRepository(),
 	}
-	preserver := command.SaveAuctionEventHandler{Repo: adapter.MariaDbAuctionRepository{Db: connection.SotDb}}
+	preserver := command.SaveAuctionEventHandler{Repo: adapter.CreateMariaDbAuctionRepository()}
 
 	return CreateAuctionRequestCommandWithInterfaces(handler, preserver)
 }
@@ -48,10 +46,6 @@ func (a AuctionRequestedCommand) Execute(event domain.Event) error {
 	err = a.preserver.Handle(event.Event, auction)
 	if err != nil {
 		return errors.New(fmt.Sprintf("Error happened during saving the auction event: %v", err))
-	}
-	err = a.publisher.Publish(event)
-	if err != nil {
-		return errors.New(fmt.Sprintf("Can not publish event: %v", err))
 	}
 	return nil
 }

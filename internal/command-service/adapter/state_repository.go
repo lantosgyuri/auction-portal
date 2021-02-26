@@ -3,11 +3,18 @@ package adapter
 import (
 	"context"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
+	"github.com/lantosgyuri/auction-portal/internal/pkg/connection"
 	"gorm.io/gorm"
 )
 
 type MariaDbStateRepository struct {
-	Db *gorm.DB
+	db *gorm.DB
+}
+
+func CreateMariaDbStateRepository() MariaDbStateRepository {
+	return MariaDbStateRepository{
+		db: connection.GetMariDbConnection(),
+	}
 }
 
 func (m MariaDbStateRepository) UpdateState(
@@ -17,7 +24,7 @@ func (m MariaDbStateRepository) UpdateState(
 
 	var currentState domain.Auction
 
-	m.Db.First(&currentState, "Id = ?", event.GetAuctionId())
+	m.db.First(&currentState, "Id = ?", event.GetAuctionId())
 
 	newState, err := update(currentState)
 
@@ -34,5 +41,5 @@ func (m MariaDbStateRepository) UpdateState(
 	state["place_event_count"] = newState.PlaceEventCount
 	state["delete_event_count"] = newState.DeleteEventCount
 
-	return m.Db.Model(&newState).Updates(state).Error
+	return m.db.Model(&newState).Updates(state).Error
 }

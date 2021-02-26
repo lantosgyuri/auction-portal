@@ -8,7 +8,6 @@ import (
 	"github.com/lantosgyuri/auction-portal/internal/command-service/adapter"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/app/command"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
-	"github.com/lantosgyuri/auction-portal/internal/pkg/connection"
 )
 
 type UserDeleteEventHandler interface {
@@ -23,12 +22,10 @@ type UserDeleteCommand struct {
 
 func CreateUserDeleteCommand() UserDeleteCommand {
 	handler := command.DeleteUserHandler{
-		Repo: adapter.MariaDbUserRepository{
-			Db: connection.SotDb,
-		},
+		Repo: adapter.CreateMariaDbUserRepository(),
 	}
 	preserver := command.SaveUserEventHandler{
-		Repo: adapter.MariaDbUserRepository{Db: connection.SotDb},
+		Repo: adapter.CreateMariaDbUserRepository(),
 	}
 
 	return CreateUserDeleteWithInterfaces(handler, preserver)

@@ -8,7 +8,6 @@ import (
 	"github.com/lantosgyuri/auction-portal/internal/command-service/adapter"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/app/command"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
-	"github.com/lantosgyuri/auction-portal/internal/pkg/connection"
 )
 
 type BidPLacedEventHandler interface {
@@ -22,20 +21,15 @@ type PreserveBidEvent interface {
 type BidPlaceRequestedCommand struct {
 	handler   BidPLacedEventHandler
 	preserver PreserveBidEvent
-	publisher EventPublisher
 }
 
 func CreateBidPlacedReqCommand() BidPlaceRequestedCommand {
 	handler := command.PlaceBidHandler{
-		StateRepo: adapter.MariaDbStateRepository{
-			Db: connection.SotDb,
-		},
-		BidRepo: adapter.MariaDbBidRepository{
-			Db: connection.SotDb},
+		StateRepo: adapter.CreateMariaDbStateRepository(),
+		BidRepo:   adapter.CreateMariaDbBidRepository(),
 	}
 	preserver := command.SaveBidEventHandler{
-		Repo: adapter.MariaDbBidRepository{
-			Db: connection.SotDb},
+		Repo: adapter.CreateMariaDbBidRepository(),
 	}
 
 	return CreateBidPlacedReqWithInterfaces(handler, preserver)
@@ -58,9 +52,6 @@ func (b BidPlaceRequestedCommand) Execute(event domain.Event) error {
 	}
 	if err := b.preserver.Handle(event.Event, bidPlacedMessage); err != nil {
 		return err
-	}
-	if err := b.publisher.Publish(event); err != nil {
-		return errors.New(fmt.Sprintf("Can not publish event: %v", err))
 	}
 
 	return nil
