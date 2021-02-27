@@ -3,11 +3,11 @@ package event_reaction
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/adapter"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/app/command"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
+	"github.com/lantosgyuri/auction-portal/internal/command-service/port"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/config"
 )
 
@@ -22,6 +22,7 @@ type PreserveBidEvent interface {
 type BidPlaceRequestedCommand struct {
 	handler   BidPLacedEventHandler
 	preserver PreserveBidEvent
+	sender    Sender
 }
 
 func CreateBidPlacedReqCommand(conf config.CommandService) BidPlaceRequestedCommand {
@@ -32,28 +33,42 @@ func CreateBidPlacedReqCommand(conf config.CommandService) BidPlaceRequestedComm
 	preserver := command.SaveBidEventHandler{
 		Repo: adapter.CreateMariaDbBidRepository(),
 	}
+	sender := port.CreatePublisher(conf.RedisConf.WriteUrl, port.FakeLogger{}, port.BidChannel)
 
-	return CreateBidPlacedReqWithInterfaces(handler, preserver)
+	return CreateBidPlacedReqWithInterfaces(handler, preserver, sender)
 }
 
-func CreateBidPlacedReqWithInterfaces(handler BidPLacedEventHandler, preserver PreserveBidEvent) BidPlaceRequestedCommand {
+func CreateBidPlacedReqWithInterfaces(
+	handler BidPLacedEventHandler,
+	preserver PreserveBidEvent,
+	sender Sender,
+) BidPlaceRequestedCommand {
 	return BidPlaceRequestedCommand{
 		handler:   handler,
 		preserver: preserver,
+		sender:    sender,
 	}
 }
 
 func (b BidPlaceRequestedCommand) Execute(event domain.Event) {
 	var bidPlacedMessage domain.BidPlaced
+	notifyEvent := domain.NotifyEvent{
+		Event:         event.Event,
+		CorrelationId: event.CorrelationId,
+	}
 	if err := json.Unmarshal(event.Payload, &bidPlacedMessage); err != nil {
-		return errors.New(fmt.Sprintf("Error happened with unmarshalling winner message: %v", err))
+		notifyEvent.Error = fmt.Sprintf("can not unarshal event: %v", err)
+		b.sender.NotifyUserFail(notifyEvent)
 	}
 	if err := b.handler.Handle(context.Background(), bidPlacedMessage); err != nil {
-		return err
+		notifyEvent.Error = fmt.Sprintf("error happened with bid placing: %v", err)
+		b.sender.NotifyUserFail(notifyEvent)
 	}
 	if err := b.preserver.Handle(event.Event, bidPlacedMessage); err != nil {
-		return err
+		notifyEvent.Error = fmt.Sprintf("error happened with saving data: %v", err)
+		b.sender.NotifyUserFail(notifyEvent)
 	}
 
-	return nil
+	b.sender.NotifyUserSuccess(notifyEvent)
+	b.sender.PublishData(event)
 }

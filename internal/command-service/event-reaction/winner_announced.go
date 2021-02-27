@@ -3,11 +3,11 @@ package event_reaction
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/adapter"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/app/command"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
+	"github.com/lantosgyuri/auction-portal/internal/command-service/port"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/config"
 )
 
@@ -18,38 +18,49 @@ type WinnerAnnouncedEventHandler interface {
 type WinnerAnnouncedCommand struct {
 	handler   WinnerAnnouncedEventHandler
 	preserver AuctionEventPreserver
-	publisher EventPublisher
+	sender    Sender
 }
 
 func CreateWinnerAnnouncedCommand(conf config.CommandService) WinnerAnnouncedCommand {
 	handler := command.AnnounceWinnerHandler{Repo: adapter.CreateMariaDbStateRepository()}
 	preserver := command.SaveAuctionEventHandler{Repo: adapter.CreateMariaDbAuctionRepository()}
-	return CreateWinnerCommandWithInterfaces(handler, preserver)
+	sender := port.CreatePublisher(conf.RedisConf.WriteUrl, port.FakeLogger{}, port.AuctionChannel)
+	return CreateWinnerCommandWithInterfaces(handler, preserver, sender)
 }
 
-func CreateWinnerCommandWithInterfaces(handler WinnerAnnouncedEventHandler, preserver AuctionEventPreserver) WinnerAnnouncedCommand {
+func CreateWinnerCommandWithInterfaces(
+	handler WinnerAnnouncedEventHandler,
+	preserver AuctionEventPreserver,
+	sender Sender,
+) WinnerAnnouncedCommand {
 	return WinnerAnnouncedCommand{
 		handler:   handler,
 		preserver: preserver,
+		sender:    sender,
 	}
 }
 
 func (w WinnerAnnouncedCommand) Execute(event domain.Event) {
 	var winnerMessage domain.WinnerAnnounced
+	notifyEvent := domain.NotifyEvent{
+		Event:         event.Event,
+		CorrelationId: event.CorrelationId,
+	}
 	if err := json.Unmarshal(event.Payload, &winnerMessage); err != nil {
-		return errors.New(fmt.Sprintf("Error happened with unmarshalling winner message: %v", err))
+		notifyEvent.Error = fmt.Sprintf("can not unarshal event: %v", err)
+		w.sender.NotifyUserFail(notifyEvent)
 	}
 
 	if err := w.handler.Handle(context.Background(), winnerMessage); err != nil {
-		return errors.New(fmt.Sprintf("Can not update state: %v", err))
+		notifyEvent.Error = fmt.Sprintf("error happened with winner announcing: %v", err)
+		w.sender.NotifyUserFail(notifyEvent)
 	}
 
 	if err := w.preserver.Handle(event.Event, winnerMessage); err != nil {
-		return errors.New(fmt.Sprintf("Error happened during saving the auction event: %v", err))
+		notifyEvent.Error = fmt.Sprintf("error happened with saving data: %v", err)
+		w.sender.NotifyUserFail(notifyEvent)
 	}
 
-	if err := w.publisher.Publish(event); err != nil {
-		return errors.New(fmt.Sprintf("Can not publish event: %v", err))
-	}
-	return nil
+	w.sender.NotifyUserSuccess(notifyEvent)
+	w.sender.PublishData(event)
 }

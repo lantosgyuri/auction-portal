@@ -3,11 +3,11 @@ package event_reaction
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/adapter"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/app/command"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
+	"github.com/lantosgyuri/auction-portal/internal/command-service/port"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/config"
 )
 
@@ -18,7 +18,7 @@ type UserDeleteEventHandler interface {
 type UserDeleteCommand struct {
 	handler   UserDeleteEventHandler
 	preserver PreserveUserEvent
-	publisher EventPublisher
+	sender    Sender
 }
 
 func CreateUserDeleteCommand(conf config.CommandService) UserDeleteCommand {
@@ -29,34 +29,46 @@ func CreateUserDeleteCommand(conf config.CommandService) UserDeleteCommand {
 		Repo: adapter.CreateMariaDbUserRepository(),
 	}
 
-	return CreateUserDeleteWithInterfaces(handler, preserver)
+	sender := port.CreatePublisher(conf.RedisConf.WriteUrl, port.FakeLogger{}, port.UserChannel)
+
+	return CreateUserDeleteWithInterfaces(handler, preserver, sender)
 }
 
-func CreateUserDeleteWithInterfaces(handler UserDeleteEventHandler, preserver PreserveUserEvent) UserDeleteCommand {
+func CreateUserDeleteWithInterfaces(
+	handler UserDeleteEventHandler,
+	preserver PreserveUserEvent,
+	sender Sender,
+) UserDeleteCommand {
 	return UserDeleteCommand{
 		handler:   handler,
 		preserver: preserver,
+		sender:    sender,
 	}
 }
 
 func (u UserDeleteCommand) Execute(event domain.Event) {
 	var userDeleteRequested domain.DeleteUserRequest
+	notifyEvent := domain.NotifyEvent{
+		Event:         event.Event,
+		CorrelationId: event.CorrelationId,
+	}
 	if err := json.Unmarshal(event.Payload, &userDeleteRequested); err != nil {
-		return errors.New(fmt.Sprintf("Error happened with unmarshalling delete user request: %v", err))
+		notifyEvent.Error = fmt.Sprintf("can not unarshal event: %v", err)
+		u.sender.NotifyUserFail(notifyEvent)
 	}
 
 	err := u.handler.Handle(context.Background(), userDeleteRequested)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Error happened with deleting user: %v", err))
+		notifyEvent.Error = fmt.Sprintf("error happened with user deleting: %v", err)
+		u.sender.NotifyUserFail(notifyEvent)
 	}
 
 	err = u.preserver.Handle(event.Event, userDeleteRequested)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Error happened during saving the user event: %v", err))
+		notifyEvent.Error = fmt.Sprintf("error happened with saving data: %v", err)
+		u.sender.NotifyUserFail(notifyEvent)
 	}
-	err = u.publisher.Publish(event)
-	if err != nil {
-		return errors.New(fmt.Sprintf("Can not publish event: %v", err))
-	}
-	return nil
+
+	u.sender.NotifyUserSuccess(notifyEvent)
+	u.sender.PublishData(event)
 }

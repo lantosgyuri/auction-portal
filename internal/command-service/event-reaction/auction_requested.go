@@ -28,7 +28,7 @@ func CreateAuctionRequestedCommand(conf config.CommandService) AuctionRequestedC
 		Repo: adapter.CreateMariaDbAuctionRepository(),
 	}
 	preserver := command.SaveAuctionEventHandler{Repo: adapter.CreateMariaDbAuctionRepository()}
-	sender := port.CreatePublisher(conf.RedisConf.WriteUrl, port.FakeLogger{}, port.BidChannel)
+	sender := port.CreatePublisher(conf.RedisConf.WriteUrl, port.FakeLogger{}, port.AuctionChannel)
 	return CreateAuctionRequestCommandWithInterfaces(handler, preserver, sender)
 }
 

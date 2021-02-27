@@ -3,11 +3,11 @@ package event_reaction
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/adapter"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/app/command"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
+	"github.com/lantosgyuri/auction-portal/internal/command-service/port"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/config"
 )
 
@@ -22,7 +22,7 @@ type PreserveUserEvent interface {
 type CreateUserCommand struct {
 	handler   CreateUserEventHandler
 	preserver PreserveUserEvent
-	publisher EventPublisher
+	sender    Sender
 }
 
 func MakeCreateUserCommand(conf config.CommandService) CreateUserCommand {
@@ -32,36 +32,46 @@ func MakeCreateUserCommand(conf config.CommandService) CreateUserCommand {
 	preserver := command.SaveUserEventHandler{
 		Repo: adapter.CreateMariaDbUserRepository(),
 	}
+	sender := port.CreatePublisher(conf.RedisConf.WriteUrl, port.FakeLogger{}, port.UserChannel)
 
-	return MakeCreateUserWithInterfaces(handler, preserver)
+	return MakeCreateUserWithInterfaces(handler, preserver, sender)
 }
 
-func MakeCreateUserWithInterfaces(handler CreateUserEventHandler, preserver PreserveUserEvent) CreateUserCommand {
+func MakeCreateUserWithInterfaces(
+	handler CreateUserEventHandler,
+	preserver PreserveUserEvent,
+	sender Sender,
+) CreateUserCommand {
 	return CreateUserCommand{
 		handler:   handler,
 		preserver: preserver,
+		sender:    sender,
 	}
 }
 
 func (c CreateUserCommand) Execute(event domain.Event) {
 	var userCreateRequest domain.CreateUserRequested
-
+	notifyEvent := domain.NotifyEvent{
+		Event:         event.Event,
+		CorrelationId: event.CorrelationId,
+	}
 	if err := json.Unmarshal(event.Payload, &userCreateRequest); err != nil {
-		return errors.New(fmt.Sprintf("Error happened with unmarshalling user create: %v", err))
+		notifyEvent.Error = fmt.Sprintf("can not unarshal event: %v", err)
+		c.sender.NotifyUserFail(notifyEvent)
 	}
 
 	err := c.handler.Handle(context.Background(), userCreateRequest)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Error happened with creating user: %v", err))
+		notifyEvent.Error = fmt.Sprintf("error happened with user creating: %v", err)
+		c.sender.NotifyUserFail(notifyEvent)
 	}
 
 	err = c.preserver.Handle(event.Event, userCreateRequest)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Error happened during saving the user event: %v", err))
+		notifyEvent.Error = fmt.Sprintf("error happened with saving data: %v", err)
+		c.sender.NotifyUserFail(notifyEvent)
 	}
-	err = c.publisher.Publish(event)
-	if err != nil {
-		return errors.New(fmt.Sprintf("Can not publish event: %v", err))
-	}
-	return nil
+
+	c.sender.NotifyUserSuccess(notifyEvent)
+	c.sender.PublishData(event)
 }

@@ -63,6 +63,7 @@ func (p *publisher) NotifyUserSuccess(event domain.NotifyEvent) {
 
 // Currently it adds only a prefix, but in a real prod env, this should be a separate struct wit ha separate connection
 func (p *publisher) NotifyUserFail(event domain.NotifyEvent) {
+	p.logger.Log(fmt.Sprintf("Event handling failed for correlationID: %v, with error: %v", event.CorrelationId, event.Error))
 	event.Success = false
 	eventBytes, err := json.Marshal(event)
 	if err != nil {
