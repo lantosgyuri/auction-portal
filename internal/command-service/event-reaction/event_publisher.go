@@ -3,8 +3,8 @@ package event_reaction
 import "github.com/lantosgyuri/auction-portal/internal/command-service/domain"
 
 type UserNotifier interface {
-	NotifyUserSuccess(correlationID int, event string)
-	NotifyUserFail(correlationID int, event string, err error)
+	NotifyUserSuccess(notifyEvent domain.NotifyEvent)
+	NotifyUserFail(notifyEvent domain.NotifyEvent)
 }
 
 type DataPublisher interface {

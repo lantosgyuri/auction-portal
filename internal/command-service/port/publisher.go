@@ -2,38 +2,85 @@ package port
 
 import (
 	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
-	"github.com/lantosgyuri/auction-portal/internal/pkg/pubsub"
 )
 
-type Channel int
+import (
+	"context"
+	"encoding/json"
+	"fmt"
+	"github.com/go-redis/redis/v8"
+	"github.com/lantosgyuri/auction-portal/internal/pkg/connection"
+	"log"
+)
 
 const (
-	Auction Channel = 1 << iota
-	Bid
-	User
-	NotifyAuction
-	NotifyBid
-	NotifyUser
+	BidChannel     = "bid"
+	AuctionChannel = "auction"
+	UserChannel    = "user"
 )
 
-var channelMapping = map[Channel]string{
-	Auction: "Auction",
-	Bid:     "Bid",
-	User:    "User",
+// logging will be implemented later
+type Logger interface {
+	Log(s string)
 }
 
-type EventSender struct {
-	publisher pubsub.Publisher
-	channel   Channel
+type FakeLogger struct{}
+
+func (l FakeLogger) Log(s string) {
+	fmt.Println(s)
 }
 
-func CreateEventSender(publisher pubsub.Publisher, channel Channel) EventSender {
-	return EventSender{
-		publisher: publisher,
-		channel:   channel,
+type publisher struct {
+	client  *redis.Client
+	logger  Logger
+	channel string
+}
+
+func CreatePublisher(url string, l Logger, ch string) *publisher {
+	c, err := connection.SetUpRedis(url)
+	if err != nil {
+		log.Fatal(fmt.Sprintf("can not create publisher: %v", err))
+	}
+
+	return &publisher{
+		client:  c,
+		logger:  l,
+		channel: ch,
 	}
 }
 
-func (e EventSender) Publish(event domain.Event) error {
-	return e.publisher.SendEvent(event, channelMapping[e.channel], event.Event)
+// Currently it adds only a prefix, but in a real prod env, this should be a separate struct wit ha separate connection
+func (p *publisher) NotifyUserSuccess(event domain.NotifyEvent) {
+	event.Success = true
+	eventBytes, err := json.Marshal(event)
+	if err != nil {
+		p.logger.Log(err.Error())
+	}
+
+	p.client.Publish(context.Background(), addPrefix(p.channel), eventBytes)
+
+}
+
+// Currently it adds only a prefix, but in a real prod env, this should be a separate struct wit ha separate connection
+func (p *publisher) NotifyUserFail(event domain.NotifyEvent) {
+	event.Success = false
+	eventBytes, err := json.Marshal(event)
+	if err != nil {
+		p.logger.Log(err.Error())
+	}
+	p.client.Publish(context.Background(), addPrefix(p.channel), eventBytes)
+}
+
+func (p *publisher) PublishData(event domain.Event) {
+	eventBytes, err := json.Marshal(event)
+	if err != nil {
+		p.logger.Log(err.Error())
+	}
+
+	p.client.Publish(context.Background(), p.channel, eventBytes)
+
+}
+
+func addPrefix(s string) string {
+	return "Notify" + s
 }
