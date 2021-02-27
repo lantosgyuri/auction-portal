@@ -43,7 +43,7 @@ func CreateBidPlacedReqWithInterfaces(handler BidPLacedEventHandler, preserver P
 	}
 }
 
-func (b BidPlaceRequestedCommand) Execute(event domain.Event) error {
+func (b BidPlaceRequestedCommand) Execute(event domain.Event) {
 	var bidPlacedMessage domain.BidPlaced
 	if err := json.Unmarshal(event.Payload, &bidPlacedMessage); err != nil {
 		return errors.New(fmt.Sprintf("Error happened with unmarshalling winner message: %v", err))

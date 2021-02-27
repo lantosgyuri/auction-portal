@@ -6,7 +6,7 @@ import (
 )
 
 type Command interface {
-	Execute(event domain.Event) error
+	Execute(event domain.Event)
 }
 
 func CreateCommands(conf config.CommandService) map[string]Command {

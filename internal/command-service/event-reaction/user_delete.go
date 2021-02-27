@@ -39,7 +39,7 @@ func CreateUserDeleteWithInterfaces(handler UserDeleteEventHandler, preserver Pr
 	}
 }
 
-func (u UserDeleteCommand) Execute(event domain.Event) error {
+func (u UserDeleteCommand) Execute(event domain.Event) {
 	var userDeleteRequested domain.DeleteUserRequest
 	if err := json.Unmarshal(event.Payload, &userDeleteRequested); err != nil {
 		return errors.New(fmt.Sprintf("Error happened with unmarshalling delete user request: %v", err))

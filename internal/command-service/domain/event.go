@@ -8,6 +8,14 @@ const UserCreateRequested = "Create_user"
 const UserDeleteRequested = "Delete_user"
 
 type Event struct {
-	Event   string
-	Payload []byte
+	Event         string
+	CorrelationId int
+	Payload       []byte
+}
+
+type NotifyEvent struct {
+	CorrelationId int
+	Event         string
+	Success       bool
+	Error         string
 }

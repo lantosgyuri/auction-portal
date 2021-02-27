@@ -40,7 +40,7 @@ func CreateBidDeletedWithInterfaces(handler BidDeletedEventHandler, preserver Pr
 	}
 }
 
-func (b BidDeleteRequestedCommand) Execute(event domain.Event) error {
+func (b BidDeleteRequestedCommand) Execute(event domain.Event) {
 	var bidDeleteMessage domain.BidDeleted
 
 	if err := json.Unmarshal(event.Payload, &bidDeleteMessage); err != nil {

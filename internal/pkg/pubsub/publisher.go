@@ -3,46 +3,44 @@ package pubsub
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"github.com/go-redis/redis/v8"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/connection"
+	"io"
+	"log"
 )
 
+// logging will be implemented later
 type Publisher struct {
-	client *redis.Client
+	client  *redis.Client
+	logger  io.Writer
+	channel string
 }
 
-func CreatePublisher(url string) (*Publisher, error) {
+func CreatePublisher(url string, l io.Writer, channel string) *Publisher {
 	c, err := connection.SetUpRedis(url)
 	if err != nil {
-		return nil, errors.New("can not create redis connection")
+		log.Fatal(fmt.Sprintf("can not create publisher: %v", err))
 	}
 
 	return &Publisher{
 		client: c,
-	}, nil
+		logger: l,
+	}
 }
 
-func (p *Publisher) SendEvent(message interface{}, channel string, eventName string) error {
-	messageBytes, err := json.Marshal(message)
+func (p *Publisher) NotifyUserSuccess(correlationId int, event string) {
+	notifyEvent := domain.NotifyEvent{
+		CorrelationId: correlationId,
+		Event:         event,
+	}
 
+	eventBytes, err := json.Marshal(notifyEvent)
 	if err != nil {
-		return errors.New(fmt.Sprintf("can not marshal message: %v", err))
+		_, _ = p.logger.Write([]byte(err.Error()))
 	}
 
-	event := domain.Event{
-		Event:   eventName,
-		Payload: messageBytes,
-	}
+	p.client.Publish(context.Background(), p.channel, eventBytes)
 
-	eventBytes, err := json.Marshal(event)
-
-	if err != nil {
-		return errors.New(fmt.Sprintf("can not marshal event: %v", err))
-	}
-
-	p.client.Publish(context.Background(), channel, eventBytes)
-	return nil
 }

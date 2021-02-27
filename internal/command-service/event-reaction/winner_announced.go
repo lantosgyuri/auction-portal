@@ -34,7 +34,7 @@ func CreateWinnerCommandWithInterfaces(handler WinnerAnnouncedEventHandler, pres
 	}
 }
 
-func (w WinnerAnnouncedCommand) Execute(event domain.Event) error {
+func (w WinnerAnnouncedCommand) Execute(event domain.Event) {
 	var winnerMessage domain.WinnerAnnounced
 	if err := json.Unmarshal(event.Payload, &winnerMessage); err != nil {
 		return errors.New(fmt.Sprintf("Error happened with unmarshalling winner message: %v", err))

@@ -11,6 +11,9 @@ const (
 	Auction Channel = 1 << iota
 	Bid
 	User
+	NotifyAuction
+	NotifyBid
+	NotifyUser
 )
 
 var channelMapping = map[Channel]string{

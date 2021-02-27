@@ -20,6 +20,7 @@ type AuctionEventPreserver interface {
 type AuctionRequestedCommand struct {
 	handler   AuctionCreateEventHandler
 	preserver AuctionEventPreserver
+	sender    Sender
 }
 
 func CreateAuctionRequestedCommand(conf config.CommandService) AuctionRequestedCommand {
@@ -35,18 +36,31 @@ func CreateAuctionRequestCommandWithInterfaces(handler AuctionCreateEventHandler
 	return AuctionRequestedCommand{handler: handler, preserver: preserver}
 }
 
-func (a AuctionRequestedCommand) Execute(event domain.Event) error {
+func (a AuctionRequestedCommand) Execute(event domain.Event) {
 	var auction domain.CreateAuctionRequested
 	if err := json.Unmarshal(event.Payload, &auction); err != nil {
-		return errors.New(fmt.Sprintf("Error happened with unmarshalling auction create: %v", err))
+		a.sender.NotifyUserFail(
+			event.CorrelationId,
+			event.Event,
+			errors.New(fmt.Sprintf("can not unarshal event: %v", err)))
 	}
 	err := a.handler.Handle(auction)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Error happened with creating auction: %v", err))
+		a.sender.NotifyUserFail(
+			event.CorrelationId,
+			event.Event,
+			errors.New(fmt.Sprintf("error happened with auction creating: %v", err)))
 	}
+
+	// TBD if it fails the firs Handle should also be reverted
 	err = a.preserver.Handle(event.Event, auction)
 	if err != nil {
-		return errors.New(fmt.Sprintf("Error happened during saving the auction event: %v", err))
+		a.sender.NotifyUserFail(
+			event.CorrelationId,
+			event.Event,
+			errors.New(fmt.Sprintf("error happened with saving data: %v", err)))
 	}
-	return nil
+
+	a.sender.NotifyUserSuccess(event.CorrelationId, event.Event)
+	a.sender.PublishData(event)
 }

@@ -53,8 +53,6 @@ func consumeMessages(config config.CommandService, eventChan chan domain.Event) 
 			fmt.Printf("no event reaction for this event: %v", event.Event)
 			continue
 		}
-		if err := reaction.Execute(event); err != nil {
-			fmt.Printf("error happened during event reaction: %v", err)
-		}
+		reaction.Execute(event)
 	}
 }

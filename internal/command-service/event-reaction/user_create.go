@@ -43,7 +43,7 @@ func MakeCreateUserWithInterfaces(handler CreateUserEventHandler, preserver Pres
 	}
 }
 
-func (c CreateUserCommand) Execute(event domain.Event) error {
+func (c CreateUserCommand) Execute(event domain.Event) {
 	var userCreateRequest domain.CreateUserRequested
 
 	if err := json.Unmarshal(event.Payload, &userCreateRequest); err != nil {
