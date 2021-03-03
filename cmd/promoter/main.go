@@ -22,7 +22,6 @@ type CreateAuction struct {
 	Name      string
 	DueDate   int
 	StartDate int
-	Timestamp int
 }
 
 type Event struct {
@@ -44,8 +43,7 @@ func publish() {
 	auction := CreateAuction{
 		DueDate:   int(time.Now().AddDate(0, 0, 8).Unix()),
 		StartDate: int(time.Now().AddDate(0, 0, 1).Unix()),
-		Timestamp: int(time.Now().Unix()),
-		Name:      "Test4",
+		Name:      "Test5",
 	}
 	send(auction, domain.AuctionRequested, "Auction", p)
 	/*

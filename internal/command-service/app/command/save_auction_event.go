@@ -10,7 +10,7 @@ type SaveAuctionEventHandler struct {
 	Repo AuctionRepository
 }
 
-func (s SaveAuctionEventHandler) Handle(eventName string, event domain.AuctionEvent) error {
+func (s SaveAuctionEventHandler) Preserve(eventName string, event interface{}) error {
 	rawEvent := domain.AuctionEventRaw{
 		EventType: eventName,
 	}
@@ -24,6 +24,6 @@ func (s SaveAuctionEventHandler) Handle(eventName string, event domain.AuctionEv
 		rawEvent.Winner = e.WinnerId
 		return s.Repo.SaveAuctionEvent(rawEvent)
 	default:
-		return errors.New(fmt.Sprintf("no event found for: %v", e))
+		return errors.New(fmt.Sprintf("no auction event found for: %v", e))
 	}
 }

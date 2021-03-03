@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
@@ -11,10 +12,10 @@ type CreateAuctionHandler struct {
 	Repo AuctionRepository
 }
 
-func (c CreateAuctionHandler) Handle(auction domain.CreateAuctionRequested) error {
+func (c CreateAuctionHandler) Handle(context context.Context, event interface{}) error {
+	auction := event.(domain.CreateAuctionRequested)
+	fmt.Printf("EVENT IS FROM HANDLE ")
 	now := int(time.Now().Unix())
-
-	// Create connection
 
 	if auction.Name == "" {
 		return errors.New("no name provided for auction")
