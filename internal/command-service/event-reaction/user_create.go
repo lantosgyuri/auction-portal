@@ -60,15 +60,15 @@ func (c CreateUserCommand) Execute(event domain.Event) {
 		c.sender.NotifyUserFail(notifyEvent)
 	}
 
-	err := c.handler.Handle(context.Background(), userCreateRequest)
+	err := c.preserver.Handle(event.Event, userCreateRequest)
 	if err != nil {
-		notifyEvent.Error = fmt.Sprintf("error happened with user creating: %v", err)
+		notifyEvent.Error = fmt.Sprintf("error happened with saving data: %v", err)
 		c.sender.NotifyUserFail(notifyEvent)
 	}
 
-	err = c.preserver.Handle(event.Event, userCreateRequest)
+	err = c.handler.Handle(context.Background(), userCreateRequest)
 	if err != nil {
-		notifyEvent.Error = fmt.Sprintf("error happened with saving data: %v", err)
+		notifyEvent.Error = fmt.Sprintf("error happened with user creating: %v", err)
 		c.sender.NotifyUserFail(notifyEvent)
 	}
 

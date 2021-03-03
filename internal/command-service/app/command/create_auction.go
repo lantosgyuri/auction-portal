@@ -14,8 +14,6 @@ type CreateAuctionHandler struct {
 func (c CreateAuctionHandler) Handle(auction domain.CreateAuctionRequested) error {
 	now := int(time.Now().Unix())
 
-	// Create connection
-
 	if auction.Name == "" {
 		return errors.New("no name provided for auction")
 	}

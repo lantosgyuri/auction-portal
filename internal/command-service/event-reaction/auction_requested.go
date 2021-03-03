@@ -51,16 +51,15 @@ func (a AuctionRequestedCommand) Execute(event domain.Event) {
 		a.sender.NotifyUserFail(notifyEvent)
 	}
 
-	err := a.handler.Handle(auction)
+	err := a.preserver.Handle(event.Event, auction)
 	if err != nil {
-		notifyEvent.Error = fmt.Sprintf("error happened with auction creating: %v", err)
+		notifyEvent.Error = fmt.Sprintf("error happened with saving data: %v", err)
 		a.sender.NotifyUserFail(notifyEvent)
 	}
 
-	// TBD if it fails the firs Handle should also be reverted
-	err = a.preserver.Handle(event.Event, auction)
+	err = a.handler.Handle(auction)
 	if err != nil {
-		notifyEvent.Error = fmt.Sprintf("error happened with saving data: %v", err)
+		notifyEvent.Error = fmt.Sprintf("error happened with auction creating: %v", err)
 		a.sender.NotifyUserFail(notifyEvent)
 	}
 

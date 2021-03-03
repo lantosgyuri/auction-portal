@@ -51,13 +51,13 @@ func (w WinnerAnnouncedCommand) Execute(event domain.Event) {
 		w.sender.NotifyUserFail(notifyEvent)
 	}
 
-	if err := w.handler.Handle(context.Background(), winnerMessage); err != nil {
-		notifyEvent.Error = fmt.Sprintf("error happened with winner announcing: %v", err)
+	if err := w.preserver.Handle(event.Event, winnerMessage); err != nil {
+		notifyEvent.Error = fmt.Sprintf("error happened with saving data: %v", err)
 		w.sender.NotifyUserFail(notifyEvent)
 	}
 
-	if err := w.preserver.Handle(event.Event, winnerMessage); err != nil {
-		notifyEvent.Error = fmt.Sprintf("error happened with saving data: %v", err)
+	if err := w.handler.Handle(context.Background(), winnerMessage); err != nil {
+		notifyEvent.Error = fmt.Sprintf("error happened with winner announcing: %v", err)
 		w.sender.NotifyUserFail(notifyEvent)
 	}
 

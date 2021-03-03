@@ -57,15 +57,15 @@ func (u UserDeleteCommand) Execute(event domain.Event) {
 		u.sender.NotifyUserFail(notifyEvent)
 	}
 
-	err := u.handler.Handle(context.Background(), userDeleteRequested)
+	err := u.preserver.Handle(event.Event, userDeleteRequested)
 	if err != nil {
-		notifyEvent.Error = fmt.Sprintf("error happened with user deleting: %v", err)
+		notifyEvent.Error = fmt.Sprintf("error happened with saving data: %v", err)
 		u.sender.NotifyUserFail(notifyEvent)
 	}
 
-	err = u.preserver.Handle(event.Event, userDeleteRequested)
+	err = u.handler.Handle(context.Background(), userDeleteRequested)
 	if err != nil {
-		notifyEvent.Error = fmt.Sprintf("error happened with saving data: %v", err)
+		notifyEvent.Error = fmt.Sprintf("error happened with user deleting: %v", err)
 		u.sender.NotifyUserFail(notifyEvent)
 	}
 

@@ -6,7 +6,6 @@ import (
 	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/pubsub"
 	"log"
-	"time"
 )
 
 var ctx = context.Background()
@@ -40,65 +39,64 @@ func publish() {
 	if err != nil {
 		log.Fatal(fmt.Sprintf("can not create publisher: %v", err))
 	}
-
-	auction := CreateAuction{
-		DueDate:   int(time.Now().AddDate(0, 0, 8).Unix()),
-		StartDate: int(time.Now().AddDate(0, 0, 1).Unix()),
-		Timestamp: int(time.Now().Unix()),
-		Name:      "Test4",
-	}
-	send(auction, domain.AuctionRequested, "Auction", p)
 	/*
-		user := domain.CreateUserRequested{
-			Name:     "Mia",
-			Password: "Secret",
-		}
+					auction := CreateAuction{
+						DueDate:   int(time.Now().AddDate(0, 0, 8).Unix()),
+						StartDate: int(time.Now().AddDate(0, 0, 1).Unix()),
+						Timestamp: int(time.Now().Unix()),
+						Name:      "Test6",
+					}
 
-	*/
-	/*
-		userIvan := domain.CreateUserRequested{
-			Name:     "Ivan2",
-			Password: "Top Secret",
-		}
+				user := domain.CreateUserRequested{
+					Name:     "Mia",
+					Password: "Secret",
+				}
 
-		userME := domain.CreateUserRequested{
-			Name:     "Gyorgy2",
-			Password: "Top Secret",
-		}
-	*/
-	/*
+
+				/*
+					userIvan := domain.CreateUserRequested{
+						Name:     "Ivan2",
+						Password: "Top Secret",
+					}
+
+					userME := domain.CreateUserRequested{
+						Name:     "Gyorgy2",
+						Password: "Top Secret",
+					}
+
+
 			userME := domain.DeleteUserRequest{
 				Name: "Mia",
-				Id:   7,
+				Id:   8,
 			}
+
 
 
 		winner := domain.WinnerAnnounced{
 			WinnerId:  2,
-			AuctionId: "0bd37b85-f5d1-4418-a796-7eaf29980005",
+			AuctionId: "00216df7-086b-4d47-b350-ca4c37ca47ab",
 		}
-
 	*/
 	bidPLaced := domain.BidPlaced{
 		Promoted:  false,
 		Amount:    5901,
 		UserId:    3,
-		AuctionId: "0bd37b85-f5d1-4418-a796-7eaf29980005",
+		AuctionId: "7dc73f8b-f69e-49a5-81e2-eb74814d4251",
 	}
 
 	fmt.Println(bidPLaced)
 	//send(bidPLaced, domain.BidPlaceRequested, "Bid", p)
 
 	bidDeleted := domain.BidDeleted{
-		BidId:     49,
-		Amount:    480,
+		BidId:     54,
+		Amount:    5901,
 		UserId:    3,
-		AuctionId: "0bd37b85-f5d1-4418-a796-7eaf29980005",
+		AuctionId: "7dc73f8b-f69e-49a5-81e2-eb74814d4251",
 	}
 
 	fmt.Print(bidDeleted)
 
-	//send(bidDeleted, domain.BidDeleteRequested, "Bid", p)
+	send(bidDeleted, domain.BidDeleteRequested, "Bid", p)
 
 }
 

@@ -57,12 +57,13 @@ func (b BidDeleteRequestedCommand) Execute(event domain.Event) {
 		b.sender.NotifyUserFail(notifyEvent)
 	}
 
-	if err := b.handler.Handle(context.Background(), bidDeleteMessage); err != nil {
-		notifyEvent.Error = fmt.Sprintf("error happened with deleting bid: %v", err)
-		b.sender.NotifyUserFail(notifyEvent)
-	}
 	if err := b.preserver.Handle(event.Event, bidDeleteMessage); err != nil {
 		notifyEvent.Error = fmt.Sprintf("error happened with saving data: %v", err)
+		b.sender.NotifyUserFail(notifyEvent)
+	}
+
+	if err := b.handler.Handle(context.Background(), bidDeleteMessage); err != nil {
+		notifyEvent.Error = fmt.Sprintf("error happened with deleting bid: %v", err)
 		b.sender.NotifyUserFail(notifyEvent)
 	}
 
