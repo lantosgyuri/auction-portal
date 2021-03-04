@@ -49,18 +49,22 @@ func (w WinnerAnnouncedCommand) Execute(event domain.Event) {
 	if err := json.Unmarshal(event.Payload, &winnerMessage); err != nil {
 		notifyEvent.Error = fmt.Sprintf("can not unarshal event: %v", err)
 		w.sender.NotifyUserFail(notifyEvent)
+		return
 	}
 
 	if err := w.preserver.Handle(event.Event, winnerMessage); err != nil {
 		notifyEvent.Error = fmt.Sprintf("error happened with saving data: %v", err)
 		w.sender.NotifyUserFail(notifyEvent)
+		return
 	}
 
 	if err := w.handler.Handle(context.Background(), winnerMessage); err != nil {
 		notifyEvent.Error = fmt.Sprintf("error happened with winner announcing: %v", err)
 		w.sender.NotifyUserFail(notifyEvent)
+		return
 	}
 
+	notifyEvent.Success = true
 	w.sender.NotifyUserSuccess(notifyEvent)
 	w.sender.PublishData(event)
 }

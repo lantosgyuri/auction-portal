@@ -49,20 +49,24 @@ func (a AuctionRequestedCommand) Execute(event domain.Event) {
 	if err := json.Unmarshal(event.Payload, &auction); err != nil {
 		notifyEvent.Error = fmt.Sprintf("can not unarshal event: %v", err)
 		a.sender.NotifyUserFail(notifyEvent)
+		return
 	}
 
 	err := a.preserver.Handle(event.Event, auction)
 	if err != nil {
 		notifyEvent.Error = fmt.Sprintf("error happened with saving data: %v", err)
 		a.sender.NotifyUserFail(notifyEvent)
+		return
 	}
 
 	err = a.handler.Handle(auction)
 	if err != nil {
 		notifyEvent.Error = fmt.Sprintf("error happened with auction creating: %v", err)
 		a.sender.NotifyUserFail(notifyEvent)
+		return
 	}
 
+	notifyEvent.Success = true
 	a.sender.NotifyUserSuccess(notifyEvent)
 	a.sender.PublishData(event)
 }

@@ -55,20 +55,24 @@ func (u UserDeleteCommand) Execute(event domain.Event) {
 	if err := json.Unmarshal(event.Payload, &userDeleteRequested); err != nil {
 		notifyEvent.Error = fmt.Sprintf("can not unarshal event: %v", err)
 		u.sender.NotifyUserFail(notifyEvent)
+		return
 	}
 
 	err := u.preserver.Handle(event.Event, userDeleteRequested)
 	if err != nil {
 		notifyEvent.Error = fmt.Sprintf("error happened with saving data: %v", err)
 		u.sender.NotifyUserFail(notifyEvent)
+		return
 	}
 
 	err = u.handler.Handle(context.Background(), userDeleteRequested)
 	if err != nil {
 		notifyEvent.Error = fmt.Sprintf("error happened with user deleting: %v", err)
 		u.sender.NotifyUserFail(notifyEvent)
+		return
 	}
 
+	notifyEvent.Success = true
 	u.sender.NotifyUserSuccess(notifyEvent)
 	u.sender.PublishData(event)
 }

@@ -60,18 +60,22 @@ func (b BidPlaceRequestedCommand) Execute(event domain.Event) {
 	if err := json.Unmarshal(event.Payload, &bidPlacedMessage); err != nil {
 		notifyEvent.Error = fmt.Sprintf("can not unarshal event: %v", err)
 		b.sender.NotifyUserFail(notifyEvent)
+		return
 	}
 
 	if err := b.preserver.Handle(event.Event, bidPlacedMessage); err != nil {
 		notifyEvent.Error = fmt.Sprintf("error happened with saving data: %v", err)
 		b.sender.NotifyUserFail(notifyEvent)
+		return
 	}
 
 	if err := b.handler.Handle(context.Background(), bidPlacedMessage); err != nil {
 		notifyEvent.Error = fmt.Sprintf("error happened with bid placing: %v", err)
 		b.sender.NotifyUserFail(notifyEvent)
+		return
 	}
 
+	notifyEvent.Success = true
 	b.sender.NotifyUserSuccess(notifyEvent)
 	b.sender.PublishData(event)
 }

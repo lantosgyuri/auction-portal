@@ -58,20 +58,24 @@ func (c CreateUserCommand) Execute(event domain.Event) {
 	if err := json.Unmarshal(event.Payload, &userCreateRequest); err != nil {
 		notifyEvent.Error = fmt.Sprintf("can not unarshal event: %v", err)
 		c.sender.NotifyUserFail(notifyEvent)
+		return
 	}
 
 	err := c.preserver.Handle(event.Event, userCreateRequest)
 	if err != nil {
 		notifyEvent.Error = fmt.Sprintf("error happened with saving data: %v", err)
 		c.sender.NotifyUserFail(notifyEvent)
+		return
 	}
 
 	err = c.handler.Handle(context.Background(), userCreateRequest)
 	if err != nil {
 		notifyEvent.Error = fmt.Sprintf("error happened with user creating: %v", err)
 		c.sender.NotifyUserFail(notifyEvent)
+		return
 	}
 
+	notifyEvent.Success = true
 	c.sender.NotifyUserSuccess(notifyEvent)
 	c.sender.PublishData(event)
 }
