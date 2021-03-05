@@ -1,20 +1,29 @@
 package command
 
-import "github.com/lantosgyuri/auction-portal/internal/command-service/domain"
+import (
+	"github.com/lantosgyuri/auction-portal/internal/data-transformer/event-reaction"
+)
 
 type AuctionRepository interface {
-	SaveAuction(auction domain.CreateAuctionRequested) error
-	SaveWinner(winner domain.WinnerAnnounced) error
+	SaveAuction(auction event_reaction.AuctionCreatedEvent) error
+	UpdateAuctionBid(bid event_reaction.BidPlacedEvent) error
+	UpdateAuctionWinner(winner event_reaction.WinnerAnnouncedEvent) error
 }
 
 type BidRepository interface {
-	SaveBid(bid domain.BidPlaced) error
-	DeleteBid(bid domain.BidDeleted) error
+	CreateUser(user event_reaction.UserCreatedEvent) error
+	SaveUserBid(bid event_reaction.BidPlacedEvent) error
+	DeleteUserBid(bid event_reaction.BidDeletedEvent) error
+	DeleteUserEntries(user event_reaction.UserDeletedEvent) error
 }
 
 type UserRepository interface {
-	SaveUser(user domain.CreateUserRequested) error
-	DeleteUser(user domain.DeleteUserRequest) error
+	SaveUser(user event_reaction.UserCreatedEvent) error
+	DeleteUser(user event_reaction.UserDeletedEvent) error
+}
+
+type WinnerRepository interface {
+	SaveWinner(winner event_reaction.WinnerAnnouncedEvent) error
 }
 
 /*
@@ -26,9 +35,9 @@ If a bid is deleted and have to roll back, than there should be also a place bid
 Delete user bid from an auction. (User table)
 
 Tables:
-Auction: Id, Name, StartDate, EndDate, CurrentPrice(maybe null), CurrentUser(maybe null), Winner(maybe null)
+Auction: Id, Name, StartDate, EndDate, CurrentPrice(maybe null), CurrentUser(maybe null), Winner(maybe null), Promoted
 User: Id, Name
 Bid: UserId, auctionId, placedBids[], deletedBids[]
-		bid{ id, amount, type }
+		bid{ id, amount, type(place, delete, promote) }
 Winner: userId, auctionId, userName, auctionName
 */

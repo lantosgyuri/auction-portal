@@ -2,20 +2,19 @@ package event_reaction
 
 import (
 	"fmt"
-	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
 	"github.com/lantosgyuri/auction-portal/internal/data-transformer/app/command"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/config"
 )
 
 type Preserver interface {
-	Execute(event domain.Event) error
+	Execute(event Event) error
 }
 
 type Command struct {
 	Preserver Preserver
 }
 
-func (c *Command) Do(event domain.Event) {
+func (c *Command) Do(event Event) {
 	err := c.Preserver.Execute(event)
 
 	if err != nil {
@@ -25,72 +24,96 @@ func (c *Command) Do(event domain.Event) {
 
 type Repo struct{}
 
-func (r Repo) SaveAuction(auction domain.CreateAuctionRequested) error {
+func (r Repo) SaveAuction(auction AuctionCreatedEvent) error {
 	fmt.Printf("SAVING AUCTION %v", auction)
 	return nil
 }
 
-func (r Repo) SaveWinner(winner domain.WinnerAnnounced) error {
+func (r Repo) UpdateAuctionBid(bid BidPlacedEvent) error {
+	fmt.Printf("UPDATE AUCTION %v", bid)
+	return nil
+}
+
+func (r Repo) UpdateAuctionWinner(winner WinnerAnnouncedEvent) error {
+	fmt.Printf("UPDATE AUCTION %v", winner)
+	return nil
+}
+
+func (r Repo) SaveWinner(winner WinnerAnnouncedEvent) error {
 	fmt.Printf("SAVING WINNER %v", winner)
 	return nil
 }
 
-func (r Repo) SaveBid(bid domain.BidPlaced) error {
+func (r Repo) SaveUserBid(bid BidPlacedEvent) error {
 	fmt.Printf("SAVING BID %v", bid)
 	return nil
 }
 
-func (r Repo) DeleteBid(bid domain.BidDeleted) error {
+func (r Repo) DeleteUserBid(bid BidDeletedEvent) error {
 	fmt.Printf("DELETING BID %v", bid)
 	return nil
 }
 
-func (r Repo) SaveUser(user domain.CreateUserRequested) error {
+func (r Repo) SaveUser(user UserCreatedEvent) error {
 	fmt.Printf("SAVING USER %v", user)
 	return nil
 }
 
-func (r Repo) DeleteUser(user domain.DeleteUserRequest) error {
+func (r Repo) DeleteUser(user UserDeletedEvent) error {
 	fmt.Printf("DELETING USER %v", user)
+	return nil
+}
+
+func (r Repo) CreateUser(user UserCreatedEvent) error {
+	fmt.Printf("CREATE BID USER %v", user)
+	return nil
+}
+
+func (r Repo) DeleteUserEntries(user UserDeletedEvent) error {
+	fmt.Printf("DELETE BID USER %v", user)
 	return nil
 }
 
 func CreateCommands(conf config.DataTransformer) map[string]Command {
 	commands := make(map[string]Command)
 
-	commands[domain.AuctionRequested] = Command{
+	commands[AuctionCreated] = Command{
 		Preserver: &command.AuctionPreserver{
-			Repo: Repo{},
+			AuctionRepo: Repo{},
 		},
 	}
 
-	commands[domain.AuctionWinnerAnnounced] = Command{
+	commands[WinnerAnnounced] = Command{
 		Preserver: &command.SaveWinner{
-			Repo: Repo{},
+			AuctionRepo: Repo{},
+			WinnerRepo:  Repo{},
 		},
 	}
 
-	commands[domain.BidPlaceRequested] = Command{
+	commands[BidPlaced] = Command{
 		Preserver: &command.SaveBid{
-			Repo: Repo{},
+			BidRepo:     Repo{},
+			AuctionRepo: Repo{},
 		},
 	}
 
-	commands[domain.BidDeleteRequested] = Command{
+	commands[BidDeleted] = Command{
 		Preserver: &command.DeleteBid{
-			Repo: Repo{},
+			BidRepo: Repo{},
 		},
 	}
 
-	commands[domain.UserCreateRequested] = Command{
+	commands[UserCreated] = Command{
 		Preserver: &command.SaveUser{
-			Repo: Repo{},
+			UserRepo: Repo{},
+			BidRepo:  Repo{},
 		},
 	}
 
-	commands[domain.UserDeleteRequested] = Command{
+	commands[UserDeleted] = Command{
 		Preserver: &command.DeleteUser{
-			Repo: Repo{},
+			UserRepo: Repo{},
+			BidRepo:  Repo{},
 		},
 	}
 

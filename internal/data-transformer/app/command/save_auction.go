@@ -1,20 +1,20 @@
 package command
 
 import (
-	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
+	event_reaction "github.com/lantosgyuri/auction-portal/internal/data-transformer/event-reaction"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/marshal"
 )
 
 type AuctionPreserver struct {
-	Repo AuctionRepository
+	AuctionRepo AuctionRepository
 }
 
-func (a *AuctionPreserver) Execute(event domain.Event) error {
-	var auction domain.CreateAuctionRequested
+func (a *AuctionPreserver) Execute(event event_reaction.Event) error {
+	var auction event_reaction.AuctionCreatedEvent
 
-	if err := marshal.Payload(event, &auction); err != nil {
+	if err := marshal.Payload(event.Payload, &auction); err != nil {
 		return err
 	}
 
-	return a.Repo.SaveAuction(auction)
+	return a.AuctionRepo.SaveAuction(auction)
 }

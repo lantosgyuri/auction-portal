@@ -1,20 +1,25 @@
 package command
 
 import (
-	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
+	event_reaction "github.com/lantosgyuri/auction-portal/internal/data-transformer/event-reaction"
+	custom_error "github.com/lantosgyuri/auction-portal/internal/pkg/custom-error"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/marshal"
 )
 
 type DeleteBid struct {
-	Repo BidRepository
+	BidRepo BidRepository
 }
 
-func (d *DeleteBid) Execute(event domain.Event) error {
-	var bid domain.BidDeleted
+func (d *DeleteBid) Execute(event event_reaction.Event) error {
+	var bid event_reaction.BidDeletedEvent
 
-	if err := marshal.Payload(event, &bid); err != nil {
+	if err := marshal.Payload(event.Payload, &bid); err != nil {
 		return err
 	}
 
-	return d.Repo.DeleteBid(bid)
+	if err := d.BidRepo.DeleteUserBid(bid); err != nil {
+		return custom_error.Create("can not delete user bid", err)
+	}
+
+	return nil
 }

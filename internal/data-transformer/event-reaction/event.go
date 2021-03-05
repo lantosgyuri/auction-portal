@@ -1,4 +1,4 @@
-package data_transformer
+package event_reaction
 
 type Event struct {
 	EventName string
