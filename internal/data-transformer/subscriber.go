@@ -3,6 +3,7 @@ package data_transformer
 import (
 	"fmt"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
+	event_reaction "github.com/lantosgyuri/auction-portal/internal/data-transformer/event-reaction"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/config"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/pubsub"
 	"sync"
@@ -22,7 +23,12 @@ func StartSubscriber(conf config.DataTransformer, parentWg *sync.WaitGroup) {
 }
 
 func consumeMessages(conf config.DataTransformer, eventChannel chan domain.Event) {
+	commands := event_reaction.CreateCommands(conf)
 	for event := range eventChannel {
-		fmt.Printf("I got events %v", event)
+		reaction, found := commands[event.Event]
+		if !found {
+			fmt.Printf("reaction not found for event: %v", event.Event)
+		}
+		reaction.Do(event)
 	}
 }
