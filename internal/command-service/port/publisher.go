@@ -14,9 +14,9 @@ import (
 )
 
 const (
-	BidChannel     = "bid"
-	AuctionChannel = "auction"
-	UserChannel    = "user"
+	BidChannel     = "Bid"
+	AuctionChannel = "Auction"
+	UserChannel    = "User"
 )
 
 // logging will be implemented later

@@ -6,6 +6,7 @@ import (
 	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
 	"github.com/lantosgyuri/auction-portal/internal/pkg/pubsub"
 	"log"
+	"time"
 )
 
 var ctx = context.Background()
@@ -39,14 +40,16 @@ func publish() {
 	if err != nil {
 		log.Fatal(fmt.Sprintf("can not create publisher: %v", err))
 	}
-	/*
-					auction := CreateAuction{
-						DueDate:   int(time.Now().AddDate(0, 0, 8).Unix()),
-						StartDate: int(time.Now().AddDate(0, 0, 1).Unix()),
-						Timestamp: int(time.Now().Unix()),
-						Name:      "Test6",
-					}
 
+	auction := CreateAuction{
+		DueDate:   int(time.Now().AddDate(0, 0, 8).Unix()),
+		StartDate: int(time.Now().AddDate(0, 0, 1).Unix()),
+		Timestamp: int(time.Now().Unix()),
+		Name:      "Test6",
+	}
+
+	send(auction, domain.AuctionRequested, "Auction", p)
+	/*
 				user := domain.CreateUserRequested{
 					Name:     "Mia",
 					Password: "Secret",
@@ -95,8 +98,6 @@ func publish() {
 	}
 
 	fmt.Print(bidDeleted)
-
-	send(bidDeleted, domain.BidDeleteRequested, "Bid", p)
 
 }
 

@@ -29,7 +29,7 @@ func CreateUserDeleteCommand(conf config.CommandService) UserDeleteCommand {
 		Repo: adapter.CreateMariaDbUserRepository(),
 	}
 
-	sender := port.CreatePublisher(conf.RedisConf.WriteUrl, port.FakeLogger{}, port.UserChannel)
+	sender := port.CreatePublisher(conf.RedisConf.QueryUrl, port.FakeLogger{}, port.UserChannel)
 
 	return CreateUserDeleteWithInterfaces(handler, preserver, sender)
 }

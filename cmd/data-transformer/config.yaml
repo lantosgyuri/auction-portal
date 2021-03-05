@@ -1,0 +1,5 @@
+redis:
+  queueUrl: redis://localhost:6365
+
+dynamo:
+  dbUrl:

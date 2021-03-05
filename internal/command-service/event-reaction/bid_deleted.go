@@ -29,7 +29,7 @@ func CreateBidDeletedCommand(conf config.CommandService) BidDeleteRequestedComma
 	preserver := command.SaveBidEventHandler{
 		Repo: adapter.CreateMariaDbBidRepository(),
 	}
-	sender := port.CreatePublisher(conf.RedisConf.WriteUrl, port.FakeLogger{}, port.BidChannel)
+	sender := port.CreatePublisher(conf.RedisConf.QueryUrl, port.FakeLogger{}, port.BidChannel)
 
 	return CreateBidDeletedWithInterfaces(handler, preserver, sender)
 }

@@ -24,7 +24,7 @@ type WinnerAnnouncedCommand struct {
 func CreateWinnerAnnouncedCommand(conf config.CommandService) WinnerAnnouncedCommand {
 	handler := command.AnnounceWinnerHandler{Repo: adapter.CreateMariaDbStateRepository()}
 	preserver := command.SaveAuctionEventHandler{Repo: adapter.CreateMariaDbAuctionRepository()}
-	sender := port.CreatePublisher(conf.RedisConf.WriteUrl, port.FakeLogger{}, port.AuctionChannel)
+	sender := port.CreatePublisher(conf.RedisConf.QueryUrl, port.FakeLogger{}, port.AuctionChannel)
 	return CreateWinnerCommandWithInterfaces(handler, preserver, sender)
 }
 
