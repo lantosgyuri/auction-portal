@@ -21,7 +21,6 @@ type AuctionEventRaw struct {
 }
 
 type CreateAuctionRequested struct {
-	UUID      string
 	Name      string
 	DueDate   int
 	StartDate int
