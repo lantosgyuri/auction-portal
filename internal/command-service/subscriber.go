@@ -1,7 +1,6 @@
 package command_service
 
 import (
-	"encoding/json"
 	"fmt"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/domain"
 	"github.com/lantosgyuri/auction-portal/internal/command-service/event-reaction"
@@ -11,38 +10,16 @@ import (
 )
 
 func StartSubscriber(conf config.CommandService, parentWg *sync.WaitGroup) {
-	wg := sync.WaitGroup{}
-	wg.Add(1)
-
-	messageChannel := make(chan []byte)
 	eventChannel := make(chan domain.Event)
 	eventSubscriber, err := pubsub.CreateSubscriber(conf.RedisConf.WriteUrl)
 
 	if err != nil {
 		fmt.Printf("error happened during create subscriber: %v", err)
-		wg.Done()
+		parentWg.Done()
 	}
 
-	eventSubscriber.AddChannel("Auction")
-	eventSubscriber.AddChannel("Bid")
-	eventSubscriber.AddChannel("User")
-
-	eventSubscriber.Get(messageChannel)
-	go convertMessage(messageChannel, eventChannel)
+	go pubsub.SubscribeToMainEvents(eventSubscriber, eventChannel)
 	go consumeMessages(conf, eventChannel)
-
-	wg.Wait()
-	parentWg.Done()
-}
-
-func convertMessage(messageChannel chan []byte, eventChannel chan domain.Event) {
-	for message := range messageChannel {
-		var event domain.Event
-		if err := json.Unmarshal(message, &event); err != nil {
-			fmt.Printf("error happened during unmarshal event: %v", err)
-		}
-		eventChannel <- event
-	}
 }
 
 func consumeMessages(config config.CommandService, eventChan chan domain.Event) {

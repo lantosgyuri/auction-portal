@@ -32,6 +32,6 @@ func main() {
 	defer connection.CloseMariaDb()
 	adapter.MigrateSotDb(&wg)
 
-	command_service.StartSubscriber(conf, &wg)
+	go command_service.StartSubscriber(conf, &wg)
 	wg.Wait()
 }
