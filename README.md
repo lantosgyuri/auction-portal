@@ -1,6 +1,8 @@
 # Auction portal
 ##### _A weekend project to implement cool things from cool articles_
 
+## Sadly the project is currently not maintained. 
+_Hope i will have time again in the near future...._
 
 ### Domain
 - Create auction
